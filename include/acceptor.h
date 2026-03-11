@@ -6,7 +6,6 @@
 #include "socket.h"
 #include "eventloop.h"
 #include "channel.h"
-
 namespace adachi::network {
     class INetAddress;
 }
@@ -22,12 +21,14 @@ namespace adachi::network {
 
         void SetNewconnetionCallback(std::function<void()> callback);
 
+        int Accept(INetAddress& addr) {
+            return socket_.Accept(addr);
+        }
+        adachi::io::Channel accept_channel_;
     private:
         adachi::network::Socket socket_;
         adachi::tool::EventLoop* owner_;
-        bool listen_check_;
-        adachi::io::Channel accept_channel_;
-        std::function<void()> newconnection_callback_;
+        bool listen_check_ = false;
     };
 }
 #endif // ACCEPTOR

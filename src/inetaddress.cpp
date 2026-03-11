@@ -62,6 +62,6 @@ namespace adachi::network {
     const sockaddr* INetAddress::GetCore() const {
         return (const sockaddr*)&addr_;
     }
-    sa_family_t INetAddress::Family() {return family_;}
-    socklen_t INetAddress::Length() {return len_;}
+    const sa_family_t INetAddress::Family() const {return family_;}
+    const socklen_t INetAddress::Length() const {return len_;}
 }

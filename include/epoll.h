@@ -7,7 +7,9 @@
 #include <memory>
 #include <algorithm>
 #include "channel.h"
-#include "eventloop.h"
+namespace adachi::tool {
+    class EventLoop;
+}
 namespace adachi::io {
     class Epoll : adachi::tool::NonCopyAble {
     public:
@@ -20,6 +22,7 @@ namespace adachi::io {
         bool UpdateChannel(Channel* channel);
         bool DeleteChannel(Channel* channel);
     private:
+        friend adachi::tool::EventLoop;
         adachi::tool::EventLoop* owner_;
         int maxevents_;
         int epoll_fd_;

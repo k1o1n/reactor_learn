@@ -7,7 +7,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 namespace adachi::network {
-    class Socket : adachi::tool::noncopyable {
+    class Socket : adachi::tool::NonCopyAble {
     public:
         Socket(int fd);
         ~Socket();
@@ -18,7 +18,9 @@ namespace adachi::network {
         bool Listen(const int& backlog);
         int Accept(INetAddress& addr);
 
-        static Socket CreateNonBlockSocket(int family = AF_INET);
+        static Socket CreateNonBlockSocket(sa_family_t family = AF_INET);
+
+        const int Fd() const;
     private:
         int fd_;
     };

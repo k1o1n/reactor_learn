@@ -19,7 +19,7 @@ namespace adachi::io {
         close(epoll_fd_);
     }
 
-    int Epoll::Poll(std::vector<Channel*>* active_list, int timeout = -1, int maxevents = 1024) {
+    int Epoll::Poll(std::vector<Channel*>* active_list, int timeout, int maxevents) {
         maxevents = std::min(maxevents, maxevents_);
         int n = epoll_wait(epoll_fd_, epoll_list_.data(), maxevents, timeout);
 

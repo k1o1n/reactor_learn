@@ -10,7 +10,7 @@ namespace adachi::io {
         , error_callback_([](){})
         , close_callback_([](){})
     {
-
+        
     }
 
     void Channel::SetReadCallback(const callback& cb) {
@@ -29,10 +29,6 @@ namespace adachi::io {
         close_callback_ = cb;
     }
 
-    void Channel::SetActive(const int status) {
-        events_ = status;
-    }
-
     const int Channel::Fd() {
         return fd_;
     }
@@ -41,8 +37,28 @@ namespace adachi::io {
         return events_;
     }
 
-    Channel* Channel::SetActiveEvents(int active_events) {
-        active_events_ = active_events;
+    Channel* Channel::SetActive(const int& status) {
+        events_ = status;
         return this;
+    }
+
+    Channel* Channel::SetActiveEvents(const int& status) {
+        active_events_ = status;
+        return this;
+    }
+
+    void Channel::Handle() {
+        if (active_events_ & Channel::kRead) {
+            read_callback_();
+        }
+        if (active_events_ & Channel::kWrite) {
+            write_callback_();
+        }
+        if (active_events_ & Channel::kError) {
+            error_callback_();
+        }
+        if (active_events_ & Channel::kClose) {
+            close_callback_();
+        }
     }
 }

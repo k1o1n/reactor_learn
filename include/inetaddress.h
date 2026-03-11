@@ -4,8 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-class Socket;
 namespace adachi::network {
+    class Socket;
     class INetAddress {
     public:
         static const sa_family_t IPV4 = AF_INET;
@@ -18,9 +18,9 @@ namespace adachi::network {
 
         const in_port_t Port();
         const std::string Ip();
-        const sockaddr* GetCore();
-        sa_family_t Family() {return family_;}
-        socklen_t Length() {return len_;}
+        const sockaddr* GetCore() const;
+        const sa_family_t Family() const;
+        const socklen_t Length() const;
     private:
         friend class Socket;
         sockaddr_storage addr_{0};

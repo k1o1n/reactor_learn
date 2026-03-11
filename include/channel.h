@@ -1,9 +1,8 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 #include <functional>
-#include "eventloop.h"
 namespace adachi::tool {
-    class Channel;
+    class EventLoop;
 }
 namespace adachi::io {
     class Channel {
@@ -12,7 +11,7 @@ namespace adachi::io {
         static const int kRead = 1;
         static const int kWrite = 2;
         static const int kError = 4;
-        static const int kCallback = 8;
+        static const int kClose = 8;
         Channel(int fd);
 
         void SetReadCallback(const callback&);
@@ -23,24 +22,26 @@ namespace adachi::io {
 
         void SetCloseCallback(const callback&);
 
-        void SetActive(const int& status);
+        Channel* SetActive(const int& status);
 
-        callback read_callback_;
-        callback write_callback_;
-        callback error_callback_;
-        callback close_callback_;
+        Channel* SetActiveEvents(const int& status);
+
+        void Handle();
 
         const int Fd();
 
         const int Events();
     private:
+        callback read_callback_;
+        callback write_callback_;
+        callback error_callback_;
+        callback close_callback_;
+        
         friend class Epoll;
         int fd_;
         int events_;
         int active_events_;
         adachi::tool::EventLoop* owner_;
-
-        Channel* SetActiveEvents(int active_events);
     };
 }
 #endif // CHANNEL_H

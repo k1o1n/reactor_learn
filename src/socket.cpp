@@ -33,9 +33,13 @@ namespace adachi::network {
         return accept(fd_, (sockaddr*)&(addr.addr_), &addr.len_);
     }
 
-    Socket Socket::CreateNonBlockSocket(int family = AF_INET) {
+    Socket Socket::CreateNonBlockSocket(sa_family_t family) {
         int fd = socket(family, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0); 
         Socket newsocket(fd);
         return newsocket;
+    }
+
+    const int Socket::Fd() const {
+        return fd_;
     }
 }

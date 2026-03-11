@@ -1,3 +1,11 @@
 # ninja log v5
-1	31	0	/home/rikka/study/reactor/build/CMakeFiles/cmake.verify_globs	cf8a5ed621a05214
-1	42	1772701360731524329	CMakeFiles/adachi.dir/src/noncopyable.cpp.o	a2694e28d504b8b4
+1	13	0	/home/rikka/study/reactor/build/CMakeFiles/cmake.verify_globs	cf8a5ed621a05214
+5	33	1773216116076631987	CMakeFiles/adachi.dir/src/noncopyable.cpp.o	a2694e28d504b8b4
+1	56	1773216116100632382	CMakeFiles/adachi.dir/src/buffer.cpp.o	841d2d2f31b24d67
+4	412	1773216116456638236	CMakeFiles/adachi.dir/src/inetaddress.cpp.o	620397a05e85cdea
+2	615	1773216116660641590	CMakeFiles/adachi.dir/src/channel.cpp.o	bdf31e27acc4f651
+5	768	1773216116812644090	CMakeFiles/adachi.dir/src/socket.cpp.o	2d27863038b2af6c
+3	1058	1773216117104648891	CMakeFiles/adachi.dir/src/epoll.cpp.o	2d687d72e3302787
+1	1101	1773216117144649549	CMakeFiles/adachi.dir/src/acceptor.cpp.o	2ae0d4b2209d44a7
+3	1348	1773216117392653627	CMakeFiles/adachi.dir/src/eventloop.cpp.o	760e0e0cdfe51391
+6	1882	1773216117924662375	CMakeFiles/test.dir/test/test.cpp.o	df9658d12e05261b

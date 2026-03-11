@@ -5,8 +5,15 @@ cmake_policy(SET CMP0009 NEW)
 # SRC_SOURCES at CMakeLists.txt:14 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/rikka/study/reactor/src/*.cpp")
 set(OLD_GLOB
+  "/home/rikka/study/reactor/src/acceptor.cpp"
+  "/home/rikka/study/reactor/src/buffer.cpp"
+  "/home/rikka/study/reactor/src/channel.cpp"
+  "/home/rikka/study/reactor/src/epoll.cpp"
+  "/home/rikka/study/reactor/src/eventloop.cpp"
+  "/home/rikka/study/reactor/src/inetaddress.cpp"
   "/home/rikka/study/reactor/src/noncopyable.cpp"
-  "/home/rikka/study/reactor/src/threadpool.cpp"
+  "/home/rikka/study/reactor/src/socket.cpp"
+  "/home/rikka/study/reactor/src/tcpconnection.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")
