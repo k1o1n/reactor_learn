@@ -53,7 +53,7 @@ namespace adachi::io {
             readptr_ = 0;
         }
     }
-    void Buffer::Expand(int size) {
+    void Buffer::Expand(unsigned int size) {
         MovePtr();
         if (size > buffer_.size()) {
             buffer_.resize(size);
