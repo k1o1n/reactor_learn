@@ -7,18 +7,23 @@ namespace adachi::network {
         : socket_(fd)
         , read_buffer_(read_buffer_size)
         , write_buffer_(write_buffer_size)
+        , channel_(fd)
     {
 
     }
-    int TcpConnection::Read();
+    int TcpConnection::Read() {
+        return -1;
+    }
     int TcpConnection::Write(const std::string& message) {
-
+        return -1;
     }
     int TcpConnection::Send() {
-
+        return -1;
     }
     void TcpConnection::Close() {
         
     }
-    TcpConnection::~TcpConnection();
+    TcpConnection::~TcpConnection() {
+        
+    }
 }

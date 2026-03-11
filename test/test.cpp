@@ -21,25 +21,25 @@ public:
                 std::shared_ptr<adachi::network::TcpConnection> _ptr;
                 this->reg_.push_back(_ptr);
                 this->reg_.back() = std::make_shared<adachi::network::TcpConnection>(n);
-                this->reg_.back()->channel.SetReadCallback([](){
+                this->reg_.back()->channel_.SetReadCallback([](){
 
                 });
-                this->reg_.back()->channel.SetWriteCallback([](){
+                this->reg_.back()->channel_.SetWriteCallback([](){
                     
                 });
-                this->reg_.back()->channel.SetErrorCallback([](){
+                this->reg_.back()->channel_.SetErrorCallback([](){
 
                 });
-                this->reg_.back()->channel.SetCloseCallback([](){
+                this->reg_.back()->channel_.SetCloseCallback([](){
                     
                 });
             }
-            this->reg_.back()->channel.SetActive(adachi::io::Channel::kRead 
+            this->reg_.back()->channel_.SetActive(adachi::io::Channel::kRead 
                 | adachi::io::Channel::kWrite 
                 | adachi::io::Channel::kError 
                 | adachi::io::Channel:: kClose);
             
-            this->epoll_.AddChannel(&this->reg_.back()->channel);
+            this->epoll_.AddChannel(&this->reg_.back()->channel_);
         });
         acceptor_.accept_channel_.SetActive(adachi::io::Channel::kRead 
                 | adachi::io::Channel::kWrite 

@@ -14,7 +14,7 @@ namespace adachi::network {
         int Send();
         void Close();
         ~TcpConnection();
-        adachi::io::Channel channel;
+        adachi::io::Channel channel_;
     private:
         Socket socket_;
         adachi::io::Buffer read_buffer_;
