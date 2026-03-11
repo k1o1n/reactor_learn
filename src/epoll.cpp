@@ -26,7 +26,7 @@ namespace adachi::io {
         active_list->clear();
         if (n > 0) {
             for (int idx = 0; idx < n; ++idx) {
-                active_list->push_back(((Channel*)(epoll_list_[idx].data.ptr))->SetActiveEvents(epoll_list_[idx].events));
+                active_list->push_back((static_cast<Channel*>(epoll_list_[idx].data.ptr))->SetActiveEvents(epoll_list_[idx].events));
             }
         }
         return n;
@@ -38,7 +38,7 @@ namespace adachi::io {
             channel->owner_ = owner_;
 
             epoll_event newevent;
-            newevent.data.ptr = (void*)channel;
+            newevent.data.ptr = static_cast<void*>(channel);
             newevent.events = channel->events_;
 
             if (epoll_ctl(epoll_fd_, EPOLL_CTL_ADD, channel->Fd(), &newevent) < 0) return false;
@@ -49,7 +49,7 @@ namespace adachi::io {
     bool Epoll::UpdateChannel(Channel* channel) {
         if (channel->owner_ != owner_) return false;
         epoll_event newevent;
-        newevent.data.ptr = (void*)channel;
+        newevent.data.ptr = static_cast<void*>(channel);
         newevent.events = channel->events_;
 
         if (epoll_ctl(epoll_fd_, EPOLL_CTL_MOD, channel->Fd(), &newevent) < 0) return false;
@@ -58,7 +58,7 @@ namespace adachi::io {
     bool Epoll::DeleteChannel(Channel* channel) {
         if (channel->owner_ != owner_) return false;
         epoll_event newevent;
-        newevent.data.ptr = (void*)channel;
+        newevent.data.ptr = static_cast<void*>(channel);
         newevent.events = channel->events_;
 
         if (epoll_ctl(epoll_fd_, EPOLL_CTL_DEL, channel->Fd(), &newevent) < 0) return false;
