@@ -2,20 +2,24 @@
 #include <cstring>
 #include <sys/uio.h>
 #include <unistd.h>
+#include <cerrno>
 namespace adachi::io {
     Buffer::Buffer(int size) {
         readptr_ = writeptr_ = 0;
         buffer_.resize(size);
     }
-    int Buffer::ReadFd(int fd) {
+    int Buffer::ReadFd(int fd, int* saveerrno) {
         iovec vec[2]{};
-        char extrabuf[65536]{};
+        char extrabuf[65536];
         vec[0].iov_len = buffer_.size() - writeptr_;
         vec[0].iov_base = buffer_.data() + writeptr_;
         vec[1].iov_len = 65536;
         vec[1].iov_base = extrabuf;
         int n = readv(fd, vec, 2);
-        if (n <= 0) return n;
+        if (n <= 0) {
+            *saveerrno = errno;
+            return n;
+        }
         if (vec[0].iov_len <= n) {
             writeptr_ = buffer_.size();
             MovePtr();
@@ -27,9 +31,11 @@ namespace adachi::io {
         else writeptr_ += n;
         return n;
     }
-    int Buffer::WriteFd(int fd) {
+    int Buffer::WriteFd(int fd, int* saveerrno) {
         int n = write(fd, buffer_.data() + readptr_, sizeof(char) * (writeptr_ - readptr_));
-        if (n <= 0) return n;
+        if (n <= 0) {
+            *saveerrno = errno; 
+        }
         readptr_ += n;
         if (readptr_ == writeptr_) writeptr_ = readptr_ = 0;
         return n;

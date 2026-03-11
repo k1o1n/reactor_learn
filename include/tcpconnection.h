@@ -5,6 +5,7 @@
 #include <string>
 #include "channel.h"
 #include "buffer.h"
+#include <memory>
 namespace adachi::network {
     class TcpConnection : adachi::tool::NonCopyAble {
     public:
@@ -14,9 +15,9 @@ namespace adachi::network {
         int Send();
         void Close();
         ~TcpConnection();
-        adachi::io::Channel channel_;
+        std::unique_ptr<adachi::io::Channel> channel_;
     private:
-        Socket socket_;
+        std::unique_ptr<Socket> socket_;
         adachi::io::Buffer read_buffer_;
         adachi::io::Buffer write_buffer_;
     };
