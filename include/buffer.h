@@ -3,22 +3,20 @@
 #include "noncopyable.h"
 #include <vector>
 #include <string>
+#include <memory>
+#include <cstring>
 namespace adachi::io {
     class Buffer : adachi::tool::NonCopyAble {
     public:
         Buffer(int size = 1024);
         int ReadFd(int fd);
-        int SendFd(int fd);
-        int WriteBuffer(const std::string& message);
-        int ReadBuffer(std::string* message, unsigned int size);
-        
+        int WriteFd(int fd);
+        void WriteBuffer(const std::string& message);
+        void ReadBuffer(std::string& message);
+        void Expand(unsigned int size);
     private:
-        void DefaultProtocol() {
-            
-        }
-
+        void MovePtr();
         std::vector<char> buffer_;
-        int headptr_;
         int readptr_;
         int writeptr_;
     };
