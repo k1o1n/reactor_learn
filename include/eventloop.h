@@ -6,9 +6,9 @@
 #include "memory"
 #include <atomic>
 #include <mutex>
-// namespace adachi::io {
-//     class Epoll;
-// }
+namespace adachi::io {
+    class Channel;
+}
 namespace adachi::tool {
     class EventLoop : adachi::tool::NonCopyAble {
     public:
@@ -21,10 +21,13 @@ namespace adachi::tool {
         bool Status() {
             return quit_.load();
         }
+        bool AddChannel(adachi::io::Channel* channel);
+        bool UpdateChannel(adachi::io::Channel* channel);
+        bool DeleteChannel(adachi::io::Channel* channel);
     private:
         adachi::io::Epoll epoll_;
-        std::atomic<bool> quit_;    // 后续改成自旋锁结构
-        std::atomic<bool> looping_; // 后续改成自旋锁
+        std::atomic<bool> quit_;    
+        std::atomic<bool> looping_; 
         std::mutex mtx_;
     };
 }

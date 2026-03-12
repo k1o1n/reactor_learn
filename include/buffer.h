@@ -13,8 +13,10 @@ namespace adachi::io {
         int ReadFd(int fd, int* saveerrno);
         int WriteFd(int fd, int* saveerrno);
         void WriteBuffer(const std::string& message);
+        void WriteBuffer(const char* message, unsigned int len);
         void ReadBuffer(std::string& message);
         void Expand(unsigned int size);
+        bool Empty();
     private:
         void MovePtr();
         std::vector<char> buffer_;

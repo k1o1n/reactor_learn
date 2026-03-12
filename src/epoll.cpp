@@ -8,6 +8,7 @@
 #include "epoll.h"
 #include "eventloop.h"
 namespace adachi::io {
+    /// 默认设置成LT模式
     Epoll::Epoll(adachi::tool::EventLoop* loop, int maxevents) 
         : maxevents_(maxevents)
         , owner_(loop)

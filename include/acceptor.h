@@ -4,12 +4,13 @@
 #include "noncopyable.h"
 #include <functional>
 #include "socket.h"
-#include "eventloop.h"
 #include "channel.h"
 namespace adachi::network {
     class INetAddress;
 }
-
+namespace adachi::tool {
+    class EventLoop;
+}
 namespace adachi::network {
     class Acceptor : adachi::tool::NonCopyAble {
     public:

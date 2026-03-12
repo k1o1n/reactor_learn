@@ -15,6 +15,10 @@ namespace adachi::network {
         if (fd_ >= 0) close(fd_);
     }
 
+    void Socket::Close() {
+        if (fd_ >= 0) close(fd_);
+    }
+
     Socket::Socket(Socket&& newsocket) {
         fd_ = newsocket.fd_;
         newsocket.fd_ = -1;

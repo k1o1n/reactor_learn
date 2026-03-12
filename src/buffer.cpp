@@ -48,6 +48,14 @@ namespace adachi::io {
         memmove(buffer_.data() + writeptr_, message.data(), message.size());
         writeptr_ += message.size();
     }
+    void Buffer::WriteBuffer(const char* message, unsigned int len) {
+        if (writeptr_ + len > buffer_.size()) {
+            MovePtr();
+            if (writeptr_ + len > buffer_.size()) buffer_.resize(writeptr_ + len);
+        }
+        memmove(buffer_.data() + writeptr_, message, len);
+        writeptr_ += len;
+    }
     void Buffer::ReadBuffer(std::string& message) {
         message.assign(buffer_.data() + readptr_, writeptr_ - readptr_);
         readptr_ = writeptr_ = 0;
@@ -64,5 +72,8 @@ namespace adachi::io {
         if (size > buffer_.size()) {
             buffer_.resize(size);
         }
+    }
+    bool Buffer::Empty() {
+        return readptr_ == writeptr_;
     }
 }

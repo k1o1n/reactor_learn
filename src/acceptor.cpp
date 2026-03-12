@@ -10,7 +10,7 @@ namespace adachi::network {
     Acceptor::Acceptor(adachi::tool::EventLoop* loop, const INetAddress &listenaddr, sa_family_t family) 
         : owner_(loop)
         , socket_(adachi::network::Socket::CreateNonBlockSocket())
-        , accept_channel_(socket_.Fd())
+        , accept_channel_(loop, socket_.Fd())
     {
         if (!socket_.BindAddress(listenaddr)) {
             std::cout << "[error] class Acceptor: BindAddress error" << std::endl;

@@ -5,6 +5,8 @@
 #include <set>
 #include <memory>
 #include <vector>
+#include <map>
+#include <set>
 #include "adachi_network.h"
 class Ipv4TcpServer : adachi::tool::NonCopyAble {
 public:
@@ -17,29 +19,44 @@ public:
             adachi::network::INetAddress addr;
             int n = this->acceptor_.Accept(addr);
             if (n >= 0) {
-
-                std::shared_ptr<adachi::network::TcpConnection> _ptr;
-                this->reg_.push_back(_ptr);
-                this->reg_.back() = std::make_shared<adachi::network::TcpConnection>(n);
-                this->reg_.back()->channel_->SetReadCallback([](){
-
+                std::shared_ptr<adachi::network::TcpConnection> _ptr = std::make_shared<adachi::network::TcpConnection>(&this->loop_, n);
+                this->reg_.insert(_ptr);
+                std::weak_ptr<adachi::network::TcpConnection> weak_conn = _ptr; // 防止泄露（传递shared_ptr会导致有一份shared_ptr指针一直指向channel导致内存无法正常释放）
+                _ptr->channel_->SetReadCallback([weak_conn](){
+                    if (auto conn = weak_conn.lock()) {
+                        int saveerrno;
+                        conn->Read(saveerrno);
+                    }
                 });
-                this->reg_.back()->channel_->SetWriteCallback([](){
-                    
+                _ptr->channel_->SetWriteCallback([weak_conn](){
+                    if (auto conn = weak_conn.lock()) {
+                        int saveerrno;
+                        conn->WriteFd(&saveerrno);
+                    }
                 });
-                this->reg_.back()->channel_->SetErrorCallback([](){
-
+                _ptr->channel_->SetErrorCallback([weak_conn](){
+                    if (auto conn = weak_conn.lock()) {
+                        // 发生错误（如RST），记录错误并关闭连接
+                        // 实际开发中可以在这里 log 一下 errno
+                        conn->Close();
+                    }
                 });
-                this->reg_.back()->channel_->SetCloseCallback([](){
-                    
+                _ptr->channel_->SetCloseCallback([weak_conn](){
+                    if (auto conn = weak_conn.lock()) {
+                        // 对端关闭连接（检测到 EPOLLRDHUP 或 EPOLLHUP），执行关闭逻辑
+                        conn->Close();
+                    }
                 });
+                _ptr->channel_->SetActive(adachi::io::Channel::kRead 
+                    | adachi::io::Channel::kWrite 
+                    | adachi::io::Channel::kError 
+                    | adachi::io::Channel:: kClose);
+                _ptr->SetCloseCallback([this](const std::shared_ptr<adachi::network::TcpConnection>& obj){
+                    this->reg_.erase(obj);
+                });
+                _ptr->SaveLifeMechanism();
+                this->epoll_.AddChannel(_ptr->channel_.get());
             }
-            this->reg_.back()->channel_->SetActive(adachi::io::Channel::kRead 
-                | adachi::io::Channel::kWrite 
-                | adachi::io::Channel::kError 
-                | adachi::io::Channel:: kClose);
-            
-            this->epoll_.AddChannel(this->reg_.back()->channel_.get());
         });
         acceptor_.accept_channel_.SetActive(adachi::io::Channel::kRead 
                 | adachi::io::Channel::kWrite 
@@ -66,7 +83,7 @@ private:
     adachi::network::Acceptor acceptor_;
     adachi::io::Epoll epoll_;
     std::thread work_thread_;
-    std::vector<std::shared_ptr<adachi::network::TcpConnection>> reg_;
+    std::set<std::shared_ptr<adachi::network::TcpConnection>> reg_;
 };
 
 int main() {
