@@ -7,6 +7,7 @@ namespace adachi::tool {
     class EventLoop;
 }
 namespace adachi::io {
+    /// Channel类可能会创建失败，需要手动调用GetOwner()检查是否绑定了一个loop
     class Channel {
     public:
         using callback = std::function<void()>;
@@ -37,6 +38,8 @@ namespace adachi::io {
         void Tie(const std::shared_ptr<void>& obj);
 
         void RemoveFromLoop();
+
+        const adachi::tool::EventLoop* GetOwner() const;
     private:
         callback read_callback_;
         callback write_callback_;

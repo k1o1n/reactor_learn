@@ -1,17 +1,23 @@
 #include "channel.h"
 #include <functional>
 #include "eventloop.h"
+#include <iostream>
 namespace adachi::io {
     Channel::Channel(adachi::tool::EventLoop* loop, int fd) 
         : fd_(fd)
         , events_(0)
+        , active_events_(0)
+        , owner_(nullptr)
         , read_callback_([](){})
         , write_callback_([](){})
         , error_callback_([](){})
         , close_callback_([](){})
-        , owner_(loop)
     {
-        
+        if (!loop->AddChannel(this)) {
+            std::cout << "[info] Channel constrution failed" << std::endl;
+            return;
+        }
+        owner_ = loop;
     }
 
     void Channel::SetReadCallback(const callback& cb) {
@@ -40,7 +46,13 @@ namespace adachi::io {
 
     Channel* Channel::SetActive(const int& status) {
         events_ = status;
-        owner_->UpdateChannel(this);
+        if (!owner_) {
+            std::cout << "[info] SetActive failed: events set successfully but owner eventloop not found" << std::endl;
+            return this;
+        }
+        if (!owner_->UpdateChannel(this)) {
+            std::cout << "[info] SetActive failed" << std::endl;
+        }
         return this;
     }
 
@@ -76,6 +88,10 @@ namespace adachi::io {
     }
 
     void Channel::RemoveFromLoop() {
-        owner_->DeleteChannel(this);
+        if (!owner_) owner_->DeleteChannel(this);
+    }
+
+    const adachi::tool::EventLoop* Channel::GetOwner() const {
+        return static_cast<const adachi::tool::EventLoop*>(owner_);
     }
 }

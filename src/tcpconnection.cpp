@@ -15,7 +15,9 @@ namespace adachi::network {
         , onmessage_([this](const std::shared_ptr<TcpConnection>& obj, adachi::io::Buffer& buffer){
             std::string message;
             buffer.ReadBuffer(message);
-            std::cout << "[info] receive " << message.size() << " bytes from fd: " << this->Fd() << std::endl;
+            // std::cout << "[info] receive " << message.size() << " bytes from fd: " << this->Fd() << std::endl;
+            int saveerrno;
+            Write(message + " OK", saveerrno);
         })
     {
         

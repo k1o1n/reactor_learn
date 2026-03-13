@@ -19,6 +19,12 @@ public:
             int n = this->acceptor_.Accept(addr);
             if (n >= 0) {
                 std::shared_ptr<adachi::network::TcpConnection> _ptr = std::make_shared<adachi::network::TcpConnection>(&this->loop_, n);
+                if (_ptr->channel_->GetOwner() == NULL) {
+                    std::cout << "[info] Tcp construction failed" << std::endl;
+                }
+                else {
+                    std::cout << "[info] Tcp Construction success" << std::endl;
+                }
                 this->reg_.insert(_ptr);
                 std::weak_ptr<adachi::network::TcpConnection> weak_conn = _ptr; // 防止泄露（传递shared_ptr会导致有一份shared_ptr指针一直指向channel导致内存无法正常释放）
                 _ptr->channel_->SetReadCallback([weak_conn](){

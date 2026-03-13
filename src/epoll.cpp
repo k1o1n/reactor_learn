@@ -7,6 +7,7 @@
 #include "channel.h"
 #include "epoll.h"
 #include "eventloop.h"
+#include <iostream>
 namespace adachi::io {
     /// 默认设置成LT模式
     Epoll::Epoll(adachi::tool::EventLoop* loop, int maxevents) 
@@ -34,6 +35,22 @@ namespace adachi::io {
     }
 
     bool Epoll::AddChannel(Channel* channel) {
+        // std::cout << "[debug] go Add" << std::endl;
+        // std::cout << "[debug] epoll owner: ";
+        // if (owner_) {
+        //     std::cout << "NOT NULL" << std::endl;
+        // }
+        // else {
+        //     std::cout << "NULL" << std::endl;
+        // }
+        // std::cout << "[debug] channel owner: ";
+        // if (channel->owner_) {
+        //     std::cout << "NOT NULL" << std::endl;
+        // }
+        // else {
+        //     std::cout << "NULL" << std::endl;
+        // }
+        
         if (channel->owner_ == owner_) return UpdateChannel(channel);
         if (!channel->owner_) {
             channel->owner_ = owner_;
@@ -48,7 +65,10 @@ namespace adachi::io {
         return false;
     }
     bool Epoll::UpdateChannel(Channel* channel) {
+        // std::cout << "[debug] go Update" << std::endl;
+
         if (channel->owner_ != owner_) return false;
+        if (!channel->owner_) return AddChannel(channel);
         epoll_event newevent;
         newevent.data.ptr = static_cast<void*>(channel);
         newevent.events = channel->events_;
