@@ -31,6 +31,7 @@ namespace adachi::network {
         /// 额外提供的关闭回调，如果不提供则不会进行任何操作，实际关闭时会传入被关闭对象的一个智能指针
         void SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>&)>&);    
         const int Fd() const;
+        bool IsWriteBufferEmpty();
 
     private:
         std::unique_ptr<Socket> socket_;

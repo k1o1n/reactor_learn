@@ -83,7 +83,7 @@ namespace adachi::network {
     }
 
     TcpConnection::~TcpConnection() {
-        
+        channel_->RemoveFromLoop();
     }
 
     void TcpConnection::SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>&, adachi::io::Buffer&)>& cb) {
@@ -96,5 +96,9 @@ namespace adachi::network {
 
     const int TcpConnection::Fd() const {
         return socket_->Fd();
+    }
+
+    bool TcpConnection::IsWriteBufferEmpty() {
+        return write_buffer_.Empty();
     }
 }

@@ -13,7 +13,6 @@ public:
     Ipv4TcpServer(const adachi::network::INetAddress& addr) 
         : loop_()
         , acceptor_(&loop_, addr)
-        , epoll_(&loop_)
     {
         acceptor_.SetNewconnetionCallback([this, &addr](){
             adachi::network::INetAddress addr;
@@ -31,7 +30,14 @@ public:
                 _ptr->channel_->SetWriteCallback([weak_conn](){
                     if (auto conn = weak_conn.lock()) {
                         int saveerrno;
-                        conn->WriteFd(&saveerrno);
+                        int n = conn->WriteFd(&saveerrno);
+
+                        if (conn->IsWriteBufferEmpty()) {
+                            auto events = conn->channel_->Events();
+                            if (events & adachi::io::Channel::kWrite)
+                                events ^= adachi::io::Channel::kWrite;
+                            conn->channel_->SetActive(events);
+                        }
                     }
                 });
                 _ptr->channel_->SetErrorCallback([weak_conn](){
@@ -55,14 +61,14 @@ public:
                     this->reg_.erase(obj);
                 });
                 _ptr->SaveLifeMechanism();
-                this->epoll_.AddChannel(_ptr->channel_.get());
+                this->loop_.AddChannel(_ptr->channel_.get());
             }
         });
         acceptor_.accept_channel_.SetActive(adachi::io::Channel::kRead 
                 | adachi::io::Channel::kWrite 
                 | adachi::io::Channel::kError 
                 | adachi::io::Channel::kClose);
-        epoll_.AddChannel(&acceptor_.accept_channel_);
+        loop_.AddChannel(&acceptor_.accept_channel_);
     }
     void Stop() {
         loop_.StopLoop();
@@ -81,7 +87,6 @@ public:
 private:
     adachi::tool::EventLoop loop_;
     adachi::network::Acceptor acceptor_;
-    adachi::io::Epoll epoll_;
     std::thread work_thread_;
     std::set<std::shared_ptr<adachi::network::TcpConnection>> reg_;
 };

@@ -25,9 +25,11 @@ namespace adachi::network {
         int Accept(INetAddress& addr) {
             return socket_.Accept(addr);
         }
-        adachi::io::Channel accept_channel_;
     private:
         adachi::network::Socket socket_;
+    public:
+        adachi::io::Channel accept_channel_;
+    private:
         adachi::tool::EventLoop* owner_;
         bool listen_check_ = false;
     };

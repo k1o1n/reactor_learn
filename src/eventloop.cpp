@@ -31,7 +31,7 @@ namespace adachi::tool {
         std::shared_ptr<std::vector<adachi::io::Channel*>> active_list = std::make_shared<std::vector<adachi::io::Channel*>>();
         while (!quit_.load()) {
             // std::lock_guard<std::mutex> lock(mtx_);
-            int siz = epoll_.Poll(active_list.get(), -1, epoll_.epoll_list_.size());
+            int siz = epoll_.Poll(active_list.get(), 100, epoll_.epoll_list_.size());
             for (int idx = 0; idx < siz; ++idx) (*active_list)[idx]->Handle();
         }
         looping_.store(false);

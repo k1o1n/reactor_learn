@@ -33,8 +33,9 @@ namespace adachi::io {
     }
     int Buffer::WriteFd(int fd, int* saveerrno) {
         int n = write(fd, buffer_.data() + readptr_, sizeof(char) * (writeptr_ - readptr_));
-        if (n <= 0) {
-            *saveerrno = errno; 
+        if (n < 0) {
+            *saveerrno = errno;
+            return n;
         }
         readptr_ += n;
         if (readptr_ == writeptr_) writeptr_ = readptr_ = 0;

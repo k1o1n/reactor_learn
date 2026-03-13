@@ -16,7 +16,9 @@ file(GLOB_RECURSE SRC_SOURCES CONFIGURE_DEPENDS
 )
 
 add_library(adachi STATIC ${SRC_SOURCES})
-target_include_directories(adachi PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(adachi PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# find_package(Threads)
+# target_link_libraries(adachi PUBLIC Threads::Threads)
 
 add_executable(test ${CMAKE_CURRENT_SOURCE_DIR}/test/test.cpp)
 target_link_libraries(test PUBLIC adachi)

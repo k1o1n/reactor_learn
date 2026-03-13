@@ -17,6 +17,7 @@ namespace adachi::network {
 
     void Socket::Close() {
         if (fd_ >= 0) close(fd_);
+        fd_ = -1;
     }
 
     Socket::Socket(Socket&& newsocket) {
@@ -34,11 +35,17 @@ namespace adachi::network {
         return listen(fd_, backlog) == 0;
     }
     int Socket::Accept(INetAddress& addr) {
-        return accept(fd_, (sockaddr*)&(addr.addr_), &addr.len_);
+        socklen_t len = sizeof(addr.addr_);
+        int connfd = accept4(fd_, (sockaddr*)&(addr.addr_), &len, SOCK_NONBLOCK | SOCK_CLOEXEC);
+        addr.len_ = len;
+        return connfd;
     }
 
     Socket Socket::CreateNonBlockSocket(sa_family_t family) {
         int fd = socket(family, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0); 
+        int opt = 1;
+        setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+        setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
         Socket newsocket(fd);
         return newsocket;
     }

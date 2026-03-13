@@ -9,7 +9,7 @@
 namespace adachi::network {
     Acceptor::Acceptor(adachi::tool::EventLoop* loop, const INetAddress &listenaddr, sa_family_t family) 
         : owner_(loop)
-        , socket_(adachi::network::Socket::CreateNonBlockSocket())
+        , socket_(adachi::network::Socket::CreateNonBlockSocket(family))
         , accept_channel_(loop, socket_.Fd())
     {
         if (!socket_.BindAddress(listenaddr)) {
@@ -19,7 +19,7 @@ namespace adachi::network {
 
     bool Acceptor::Listen(const int& backlog) {
         if (socket_.Listen(backlog)) {
-            listen_check_ = false;
+            listen_check_ = true;
             return true;
         }
         return false;
