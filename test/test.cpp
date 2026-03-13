@@ -80,7 +80,7 @@ public:
         loop_.StopLoop();
     }
     void Loop() {
-        while (loop_.Status());
+        // while (loop_.Status());
         acceptor_.Listen();
         work_thread_ = std::thread([this]() {
             loop_.Loop();

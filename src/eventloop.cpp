@@ -18,7 +18,7 @@ namespace adachi::tool {
 
     void EventLoop::StopLoop() {
         quit_.store(true);
-        std::unique_lock<std::mutex> lock(mtx_);
+        // std::unique_lock<std::mutex> lock(mtx_);
     }
 
     EventLoop::~EventLoop() {
