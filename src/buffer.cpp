@@ -50,7 +50,6 @@ namespace adachi::io {
         writeptr_ += message.size();
     }
     void Buffer::WriteBuffer(const char* message, unsigned int len) {
-        1
         if (writeptr_ + len > buffer_.size()) {
             MovePtr();
             if (writeptr_ + len > buffer_.size()) buffer_.resize(writeptr_ + len);
