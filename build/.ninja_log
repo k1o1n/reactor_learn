@@ -1,14 +1,14 @@
 # ninja log v5
-1	30	0	/home/rikka/study/reactor/build/CMakeFiles/cmake.verify_globs	cf8a5ed621a05214
-6	54	1773474200240267801	CMakeFiles/adachi.dir/src/noncopyable.cpp.o	a2694e28d504b8b4
-7	536	1773474200720275496	CMakeFiles/adachi.dir/src/socket.cpp.o	2d27863038b2af6c
-2	775	1773474200960279344	CMakeFiles/adachi.dir/src/buffer.cpp.o	841d2d2f31b24d67
-5	800	1773474200984279729	CMakeFiles/adachi.dir/src/inetaddress.cpp.o	620397a05e85cdea
-4	1223	1773474201408286526	CMakeFiles/adachi.dir/src/eventloop.cpp.o	760e0e0cdfe51391
-0	1240	1773474201424286783	CMakeFiles/adachi.dir/src/acceptor.cpp.o	2ae0d4b2209d44a7
-4	1337	1773474201524288386	CMakeFiles/adachi.dir/src/epoll.cpp.o	2d687d72e3302787
-8	1486	1773474201672290759	CMakeFiles/adachi.dir/src/tcpconnection.cpp.o	daadd2136113ca73
-2	1540	1773474201728291656	CMakeFiles/adachi.dir/src/channel.cpp.o	bdf31e27acc4f651
-1540	1587	1773474201772292362	libadachi.a	76c28e0a4288a603
-9	2083	1773474202268300313	CMakeFiles/test.dir/test/test.cpp.o	df9658d12e05261b
-2083	2218	1773474202400302429	test	c88288f5b83949f8
+0	30	0	/home/rikka/study/reactor/build/CMakeFiles/cmake.verify_globs	cf8a5ed621a05214
+3	41	1773474781537563959	CMakeFiles/adachi.dir/src/noncopyable.cpp.o	a2694e28d504b8b4
+3	423	1773474781921570089	CMakeFiles/adachi.dir/src/inetaddress.cpp.o	620397a05e85cdea
+0	711	1773474782209574688	CMakeFiles/adachi.dir/src/buffer.cpp.o	841d2d2f31b24d67
+4	895	1773474782393577625	CMakeFiles/adachi.dir/src/socket.cpp.o	2d27863038b2af6c
+0	1116	1773474782613581137	CMakeFiles/adachi.dir/src/acceptor.cpp.o	2ae0d4b2209d44a7
+2	1235	1773474782733583053	CMakeFiles/adachi.dir/src/epoll.cpp.o	2d687d72e3302787
+1	1261	1773474782757583436	CMakeFiles/adachi.dir/src/channel.cpp.o	bdf31e27acc4f651
+2	1583	1773474783081588610	CMakeFiles/adachi.dir/src/eventloop.cpp.o	760e0e0cdfe51391
+6	2367	1773474783861601062	CMakeFiles/test.dir/test/test.cpp.o	df9658d12e05261b
+5	2459	1773474783957602594	CMakeFiles/adachi.dir/src/tcpconnection.cpp.o	daadd2136113ca73
+2459	2535	1773474784033603808	libadachi.a	76c28e0a4288a603
+2535	2881	1773474784373609237	test	c88288f5b83949f8

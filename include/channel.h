@@ -26,6 +26,7 @@ namespace adachi::io {
 
         void SetCloseCallback(const callback&);
         /// 修改当前channel关注的事件
+        /// 必须确认当前channel属于某个EventLoop，否则调用无效，仅修改内部表示当前channel希望关注的事件的变量
         Channel* SetActive(const int& status);
         /// 辅助函数，将表示被激活事件变量status赋值给内部激活事件检查变量
         Channel* SetActiveEvents(const int& status);
