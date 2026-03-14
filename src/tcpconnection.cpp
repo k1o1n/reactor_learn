@@ -19,10 +19,12 @@ namespace adachi::network {
             int saveerrno;
             Write(message + " OK", saveerrno);
         })
+        , status_(kConnecting)
     {
         
     }
     int TcpConnection::Read(int& saveerrno) {
+        if (status_ != kConnecting) return -1;
         int n = read_buffer_.ReadFd(socket_->Fd(), &saveerrno);
 
         if (n > 0) {
@@ -42,6 +44,7 @@ namespace adachi::network {
         return n;
     }
     int TcpConnection::Write(const std::string& message, int& saveerrno) {
+        if (status_ != kConnecting) return 0;
         size_t _ = message.size();
         int n = 0;
         if (write_buffer_.Empty()) {
@@ -71,13 +74,36 @@ namespace adachi::network {
         return n;
     }
     int TcpConnection::WriteFd(int* saveerrno) {
-        return write_buffer_.WriteFd(Fd(), saveerrno);
+        if (status_ == kDisConnected) return 0;
+        int n = write_buffer_.WriteFd(Fd(), saveerrno);
+        
+        if (write_buffer_.Empty()) {
+            if (channel_->Events() & adachi::io::Channel::kWrite) channel_->SetActive(channel_->Events() ^ adachi::io::Channel::kWrite);
+            
+            if (status_ == kDisConnecting) {
+                status_ = kDisConnected;
+                auto ptr = shared_from_this();
+                if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
+                channel_->RemoveFromLoop(); // 关闭所在epoll
+                socket_->Close();
+                Close();
+            }
+        }
+        return n;
     }
     void TcpConnection::Close() {
-        auto ptr = shared_from_this();
-        if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
-        channel_->RemoveFromLoop(); // 关闭所在epoll
-        socket_->Close();
+        if (status_ == kDisConnected) return;
+        if (write_buffer_.Empty()) {
+            status_ = kDisConnected;
+            auto ptr = shared_from_this();
+            if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
+            channel_->RemoveFromLoop(); // 关闭所在epoll
+            socket_->Close();
+        }
+        else {
+            status_ = kDisConnecting;
+            channel_->SetActive(channel_->Events() | adachi::io::Channel::kWrite);
+        }
     }
 
     void TcpConnection::SaveLifeMechanism() {

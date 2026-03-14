@@ -8,6 +8,7 @@ namespace adachi::tool {
 }
 namespace adachi::io {
     /// Channel类可能会创建失败，需要手动调用GetOwner()检查是否绑定了一个loop
+    /// 在高并发场景下Handle成员函数可能有问题
     class Channel {
     public:
         using callback = std::function<void()>;
@@ -29,6 +30,7 @@ namespace adachi::io {
         /// 辅助函数，将表示被激活事件变量status赋值给内部激活事件检查变量
         Channel* SetActiveEvents(const int& status);
 
+        /// 可能运行中途出现了错误的情况，尚未处理，需要进行加锁判断，在执行回调函数之前要判断tcp连接情况
         void Handle();
 
         const int Fd();

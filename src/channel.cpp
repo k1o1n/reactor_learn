@@ -88,7 +88,7 @@ namespace adachi::io {
     }
 
     void Channel::RemoveFromLoop() {
-        if (!owner_) owner_->DeleteChannel(this);
+        if (owner_) owner_->DeleteChannel(this);
     }
 
     const adachi::tool::EventLoop* Channel::GetOwner() const {

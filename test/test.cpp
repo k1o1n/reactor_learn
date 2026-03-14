@@ -33,6 +33,8 @@ public:
                         conn->Read(saveerrno);
                     }
                 });
+                /// 设置可写回调函数时必须调用TcpConnection本身的WriteFd函数
+                /// TcpConnection的WriteFd函数涉及到TcpConnction的正常关闭
                 _ptr->channel_->SetWriteCallback([weak_conn](){
                     if (auto conn = weak_conn.lock()) {
                         int saveerrno;
