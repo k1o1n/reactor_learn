@@ -17,6 +17,7 @@ namespace adachi::network {
     /// 默认关闭时只关闭eventloop，即调用EventLoop::DeleteChannel
     /// TcpConnection类由于持有Channel，创建后需要检查是否绑定成功Eventloop（调用Channel成员的GetOwner()检查）
     /// 默认创建后就会被加入到一个EventLoop中
+    /// 设置该类的可写回调时必须显示调用该类的WriteFd函数，这涉及到该类的正常关闭
     class TcpConnection : adachi::tool::NonCopyAble, public std::enable_shared_from_this<TcpConnection> {
     public:
         TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size = 1024, unsigned int write_buffer_size = 1024);
