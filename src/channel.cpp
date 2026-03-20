@@ -4,14 +4,14 @@
 #include <iostream>
 namespace adachi::io {
     Channel::Channel(adachi::tool::EventLoop* loop, int fd) 
-        : fd_(fd)
-        , events_(0)
-        , active_events_(0)
-        , owner_(nullptr)
-        , read_callback_([](){})
+        : read_callback_([](){})
         , write_callback_([](){})
         , error_callback_([](){})
         , close_callback_([](){})
+        , fd_(fd)
+        , events_(0)
+        , active_events_(0)
+        , owner_(nullptr)
     {
         if (!loop->AddChannel(this)) {
             std::cout << "[info] Channel constrution failed" << std::endl;
@@ -36,11 +36,11 @@ namespace adachi::io {
         close_callback_ = cb;
     }
 
-    const int Channel::Fd() {
+    int Channel::Fd() {
         return fd_;
     }
 
-    const int Channel::Events() {
+    int Channel::Events() {
         return events_;
     }
 

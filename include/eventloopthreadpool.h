@@ -12,9 +12,9 @@ namespace adachi::tool {
     /// 初始化传入参数中的prework为EventLoopThread启动前会先做的操作，可以选择不做任何事情
     class EventLoopThreadPool : NonCopyAble {
     public:
-        EventLoopThreadPool(std::function<void(EventLoopThread*)> prework = [](EventLoopThread* loop){}, int maxevents = 1024);
-        const unsigned int Size() const;
-        const unsigned int MaxSize() const;
+        EventLoopThreadPool(std::function<void(EventLoopThread*)> prework = [](EventLoopThread*){}, int maxevents = 1024);
+        unsigned int Size() const;
+        unsigned int MaxSize() const;
         EventLoop* GetOneThread();
         std::vector<EventLoop*> GetAllThread();
         void Start();

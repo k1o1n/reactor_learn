@@ -1,5 +1,5 @@
 #!/bin/sh
 cd /home/rikka/study/reactor
 git add .
-git commit -m "feat: multi thread support"
+git commit -m "fix: subliminal bug"
 git push reactor_learn

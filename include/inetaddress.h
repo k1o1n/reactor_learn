@@ -16,14 +16,14 @@ namespace adachi::network {
         bool SetIP(const std::string& ip);
         void SetPort(const in_port_t& port);
 
-        const in_port_t Port();
-        const std::string Ip();
+        in_port_t Port();
+        std::string Ip();
         const sockaddr* GetCore() const;
-        const sa_family_t Family() const;
-        const socklen_t Length() const;
+        sa_family_t Family() const;
+        socklen_t Length() const;
     private:
         friend class Socket;
-        sockaddr_storage addr_{0};
+        sockaddr_storage addr_{};
         socklen_t len_;
         sa_family_t family_;
     };

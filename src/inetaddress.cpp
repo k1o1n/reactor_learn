@@ -39,7 +39,7 @@ namespace adachi::network {
         }
     }
 
-    const in_port_t INetAddress::Port() {
+    in_port_t INetAddress::Port() {
         if (addr_.ss_family == AF_INET6) {
             return ntohs(reinterpret_cast<sockaddr_in6*>(&addr_)->sin6_port);
         }
@@ -47,7 +47,7 @@ namespace adachi::network {
             return ntohs(reinterpret_cast<sockaddr_in*>(&addr_)->sin_port);
         }
     }
-    const std::string INetAddress::Ip() {
+    std::string INetAddress::Ip() {
         if (addr_.ss_family == AF_INET6) {
             char buf[INET6_ADDRSTRLEN]{};
             const char* p = inet_ntop(AF_INET6, &reinterpret_cast<sockaddr_in6*>(&addr_)->sin6_addr, buf, sizeof(buf));
@@ -62,6 +62,6 @@ namespace adachi::network {
     const sockaddr* INetAddress::GetCore() const {
         return reinterpret_cast<const sockaddr*>(&addr_);
     }
-    const sa_family_t INetAddress::Family() const {return family_;}
-    const socklen_t INetAddress::Length() const {return len_;}
+    sa_family_t INetAddress::Family() const {return family_;}
+    socklen_t INetAddress::Length() const {return len_;}
 }

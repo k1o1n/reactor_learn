@@ -20,7 +20,7 @@ namespace adachi::network {
 
         static Socket CreateNonBlockSocket(sa_family_t family = AF_INET);
 
-        const int Fd() const;
+        int Fd() const;
 
         void Close();
     private:

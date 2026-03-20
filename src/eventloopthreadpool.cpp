@@ -3,16 +3,16 @@
 #include <algorithm>
 
 namespace adachi::tool {
-    EventLoopThreadPool::EventLoopThreadPool(std::function<void(EventLoopThread* loop)> prework, int maxevents) 
-        : prework_(prework)
-        , maxevents_(maxevents)
+    EventLoopThreadPool::EventLoopThreadPool(std::function<void(EventLoopThread*)> prework, int maxevents) 
+        : maxevents_(maxevents)
+        , prework_(prework)
     {
 
     }
-    const unsigned int EventLoopThreadPool::Size() const {
+    unsigned int EventLoopThreadPool::Size() const {
         return num_;
     }
-    const unsigned int EventLoopThreadPool::MaxSize() const {
+    unsigned int EventLoopThreadPool::MaxSize() const {
         return maxnum_;
     }
     EventLoop* EventLoopThreadPool::GetOneThread() {

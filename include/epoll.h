@@ -23,8 +23,8 @@ namespace adachi::io {
         bool DeleteChannel(Channel* channel);
     private:
         friend adachi::tool::EventLoop;
-        adachi::tool::EventLoop* owner_;
         int maxevents_;
+        adachi::tool::EventLoop* owner_;
         int epoll_fd_;
         std::vector<epoll_event> epoll_list_;
     };

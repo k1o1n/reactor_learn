@@ -51,7 +51,7 @@ build cmake_object_order_depends_target_adachi: phony || CMakeFiles/adachi.dir
 
 build CMakeFiles/adachi.dir/src/acceptor.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/acceptor.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/acceptor.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -60,7 +60,7 @@ build CMakeFiles/adachi.dir/src/acceptor.cpp.o: CXX_COMPILER__adachi_Debug /home
 
 build CMakeFiles/adachi.dir/src/buffer.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/buffer.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/buffer.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -69,7 +69,7 @@ build CMakeFiles/adachi.dir/src/buffer.cpp.o: CXX_COMPILER__adachi_Debug /home/r
 
 build CMakeFiles/adachi.dir/src/channel.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/channel.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/channel.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -78,7 +78,7 @@ build CMakeFiles/adachi.dir/src/channel.cpp.o: CXX_COMPILER__adachi_Debug /home/
 
 build CMakeFiles/adachi.dir/src/epoll.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/epoll.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/epoll.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -87,7 +87,7 @@ build CMakeFiles/adachi.dir/src/epoll.cpp.o: CXX_COMPILER__adachi_Debug /home/ri
 
 build CMakeFiles/adachi.dir/src/eventloop.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/eventloop.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/eventloop.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -96,7 +96,7 @@ build CMakeFiles/adachi.dir/src/eventloop.cpp.o: CXX_COMPILER__adachi_Debug /hom
 
 build CMakeFiles/adachi.dir/src/eventloopthread.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/eventloopthread.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/eventloopthread.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -105,7 +105,7 @@ build CMakeFiles/adachi.dir/src/eventloopthread.cpp.o: CXX_COMPILER__adachi_Debu
 
 build CMakeFiles/adachi.dir/src/eventloopthreadpool.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/eventloopthreadpool.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/eventloopthreadpool.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -114,7 +114,7 @@ build CMakeFiles/adachi.dir/src/eventloopthreadpool.cpp.o: CXX_COMPILER__adachi_
 
 build CMakeFiles/adachi.dir/src/inetaddress.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/inetaddress.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/inetaddress.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -123,7 +123,7 @@ build CMakeFiles/adachi.dir/src/inetaddress.cpp.o: CXX_COMPILER__adachi_Debug /h
 
 build CMakeFiles/adachi.dir/src/noncopyable.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/noncopyable.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/noncopyable.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -132,7 +132,7 @@ build CMakeFiles/adachi.dir/src/noncopyable.cpp.o: CXX_COMPILER__adachi_Debug /h
 
 build CMakeFiles/adachi.dir/src/socket.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/socket.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/socket.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -141,7 +141,7 @@ build CMakeFiles/adachi.dir/src/socket.cpp.o: CXX_COMPILER__adachi_Debug /home/r
 
 build CMakeFiles/adachi.dir/src/tcpconnection.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/tcpconnection.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/tcpconnection.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
@@ -150,7 +150,7 @@ build CMakeFiles/adachi.dir/src/tcpconnection.cpp.o: CXX_COMPILER__adachi_Debug 
 
 build CMakeFiles/adachi.dir/src/tcpserver.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/tcpserver.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/tcpserver.cpp.o.d
-  FLAGS = -g -std=c++17
+  FLAGS = -g -Wall -Wextra -Werror -std=c++17
   INCLUDES = -I/home/rikka/study/reactor/include
   OBJECT_DIR = CMakeFiles/adachi.dir
   OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src

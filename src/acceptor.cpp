@@ -8,9 +8,9 @@
 #include "acceptor.h"
 namespace adachi::network {
     Acceptor::Acceptor(adachi::tool::EventLoop* loop, const INetAddress &listenaddr, sa_family_t family) 
-        : owner_(loop)
-        , socket_(adachi::network::Socket::CreateNonBlockSocket(family))
+        : socket_(adachi::network::Socket::CreateNonBlockSocket(family))
         , accept_channel_(loop, socket_.Fd())
+        , owner_(loop)
     {
         if (!socket_.BindAddress(listenaddr)) {
             std::cout << "[error] class Acceptor: BindAddress error" << std::endl;

@@ -8,18 +8,18 @@
 #include <iostream>
 namespace adachi::network {
     TcpConnection::TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size, unsigned int write_buffer_size) 
-        : socket_(std::make_unique<Socket>(fd))
+        : channel_(std::make_unique<adachi::io::Channel>(loop, fd))
+        , status_(kConnecting)
+        , socket_(std::make_unique<Socket>(fd))
         , read_buffer_(read_buffer_size)
         , write_buffer_(write_buffer_size)
-        , channel_(std::make_unique<adachi::io::Channel>(loop, fd))
-        , onmessage_([this](const std::shared_ptr<TcpConnection>& obj, adachi::io::Buffer& buffer){
+        , onmessage_([](const std::shared_ptr<TcpConnection>& obj, adachi::io::Buffer& buffer){
             std::string message;
             buffer.ReadBuffer(message);
             // std::cout << "[info] receive " << message.size() << " bytes from fd: " << this->Fd() << std::endl;
             int saveerrno;
-            Write(message + " OK", saveerrno);
+            obj->Write(message + " OK", saveerrno);
         })
-        , status_(kConnecting)
     {
         
     }
@@ -48,9 +48,9 @@ namespace adachi::network {
         size_t _ = message.size();
         int n = 0;
         if (write_buffer_.Empty()) {
-            n = write(socket_->Fd(), message.c_str(), _);
+            int n = write(socket_->Fd(), message.c_str(), _);
             if (n >= 0) {
-                if (n != message.size()) {
+                if (static_cast<unsigned int>(n) != message.size()) {
                     write_buffer_.WriteBuffer(message.data() + n, message.size() - n);
                 }
             }
@@ -96,9 +96,9 @@ namespace adachi::network {
         if (write_buffer_.Empty()) {
             status_ = kDisConnected;
             auto ptr = shared_from_this();
-            if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
             channel_->RemoveFromLoop(); // 关闭所在epoll
             socket_->Close();
+            if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
         }
         else {
             status_ = kDisConnecting;
@@ -122,7 +122,7 @@ namespace adachi::network {
         close_callback_ = cb;
     }
 
-    const int TcpConnection::Fd() const {
+    int TcpConnection::Fd() const {
         return socket_->Fd();
     }
 

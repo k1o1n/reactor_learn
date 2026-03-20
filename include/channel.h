@@ -34,9 +34,9 @@ namespace adachi::io {
         /// 可能运行中途出现了错误的情况，尚未处理，需要进行加锁判断，在执行回调函数之前要判断tcp连接情况
         void Handle();
 
-        const int Fd();
+        int Fd();
 
-        const int Events();
+        int Events();
 
         void Tie(const std::shared_ptr<void>& obj);
 

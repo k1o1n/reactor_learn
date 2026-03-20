@@ -50,7 +50,7 @@ namespace adachi::network {
         return newsocket;
     }
 
-    const int Socket::Fd() const {
+    int Socket::Fd() const {
         return fd_;
     }
 }

@@ -20,10 +20,10 @@ namespace adachi::io {
             *saveerrno = errno;
             return n;
         }
-        if (vec[0].iov_len <= n) {
+        if (static_cast<std::size_t>(n) >= vec[0].iov_len) {
             writeptr_ = buffer_.size();
             MovePtr();
-            int need = n - vec[0].iov_len;
+            std::size_t need = n - vec[0].iov_len;
             if (need + writeptr_ > buffer_.size()) Expand(need + writeptr_);
             std::memmove(buffer_.data() + writeptr_, extrabuf, need);
             writeptr_ += need;

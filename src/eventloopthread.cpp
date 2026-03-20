@@ -3,7 +3,6 @@
 namespace adachi::tool {
     EventLoopThread::EventLoopThread(std::function<void(EventLoopThread*)> prework, int maxevents) 
         : prework_(prework)
-        , loop_(nullptr)
         , start_([this, maxevents](){
             EventLoop loop(maxevents);
             prework_(this);
@@ -18,6 +17,7 @@ namespace adachi::tool {
             std::lock_guard<std::mutex> lock(this->mtx_);
             this->loop_ = nullptr;
         })
+        , loop_(nullptr)
     {
 
     }
