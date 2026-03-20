@@ -10,10 +10,13 @@ set(OLD_GLOB
   "/home/rikka/study/reactor/src/channel.cpp"
   "/home/rikka/study/reactor/src/epoll.cpp"
   "/home/rikka/study/reactor/src/eventloop.cpp"
+  "/home/rikka/study/reactor/src/eventloopthread.cpp"
+  "/home/rikka/study/reactor/src/eventloopthreadpool.cpp"
   "/home/rikka/study/reactor/src/inetaddress.cpp"
   "/home/rikka/study/reactor/src/noncopyable.cpp"
   "/home/rikka/study/reactor/src/socket.cpp"
   "/home/rikka/study/reactor/src/tcpconnection.cpp"
+  "/home/rikka/study/reactor/src/tcpserver.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

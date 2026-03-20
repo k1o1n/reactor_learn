@@ -12,10 +12,10 @@ namespace adachi::io {
     class Channel {
     public:
         using callback = std::function<void()>;
-        static const int kRead = EPOLLIN;
-        static const int kWrite = EPOLLOUT;
-        static const int kError = EPOLLERR;
-        static const int kClose = EPOLLRDHUP;
+        static constexpr int kRead = EPOLLIN;
+        static constexpr int kWrite = EPOLLOUT;
+        static constexpr int kError = EPOLLERR;
+        static constexpr int kClose = EPOLLRDHUP;
         Channel(adachi::tool::EventLoop* loop, int fd);
 
         void SetReadCallback(const callback&);
