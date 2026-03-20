@@ -6,7 +6,9 @@
 #include <vector>
 #include <mutex>
 #include <memory>
+#include <iostream>
 #include <sys/eventfd.h>
+#include <cerror>
 namespace adachi::tool {
     /// 非阻塞+LT模式
     EventLoop::EventLoop(int maxevents) 
@@ -20,7 +22,10 @@ namespace adachi::tool {
             wakeupchannel_.SetReadCallback([this](){
                 if (this->wakeupchannel_.Fd() >= 0) {
                     uint64_t one;
-                    read(this->wakeupchannel_.Fd(), &one, sizeof(one));
+                    int n = read(this->wakeupchannel_.Fd(), &one, sizeof(one));
+                    if (n <= 0) {
+                        std::cout << "[Error] wakeup fail: " << strerr(errno) << std::endl;
+                    }
                 }
             });
             wakeupchannel_.SetActive(adachi::io::Channel::kRead);
