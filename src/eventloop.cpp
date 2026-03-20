@@ -82,7 +82,24 @@ namespace adachi::tool {
     void EventLoop::WakeUp() {
         if (wakeupchannel_.Fd() >= 0) {
             uint64_t one = 1;
-            write(wakeupchannel_.Fd(), &one, sizeof(one));
+            int n = write(wakeupchannel_.Fd(), &one, sizeof(one));
+
+            if (n != sizeof(one)) {
+               // 处理错误
+                if (n < 0) {
+                    if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                        // 计数器满了，也可以认为任务已经达成了（肯定是 awakening 状态）
+                        return;
+                    }
+                    if (errno == EINTR) {
+                        // 信号中断，可以重试，也可以忽略（既然是为了唤醒，一次失败通常不致命，但也可能导致延迟）
+                        return; 
+                    }
+                    std::cerr << "[Error] EventLoop WakeUp failed: " <<  strerror(errno) << std::endl;
+                }
+               // n < 0 (其他错误) 或 n >= 0 (但不是 8)
+               std::cerr << "[Error] EventLoop WakeUp failed: writes " << n << " bytes failed: " << strerror(errno) << std::endl;
+            }
         }
     }
 
