@@ -6,6 +6,7 @@
 #include "channel.h"
 #include "eventloop.h"
 #include <iostream>
+#include <cstring>
 namespace adachi::network {
     TcpConnection::TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size, unsigned int write_buffer_size) 
         : channel_(std::make_unique<adachi::io::Channel>(loop, fd))
@@ -33,11 +34,11 @@ namespace adachi::network {
         else if (n == 0) {
             Close();
         } else {
-            saveerrno = errno;
-            if (saveerrno == EAGAIN || saveerrno == EWOULDBLOCK) {
+            if (saveerrno == EAGAIN || saveerrno == EWOULDBLOCK || saveerrno == EINTR) {
 
             }
             else {
+                std::cout << "[Error] TcpConnection Read failed: " << strerror(saveerrno) << std::endl;
                 Close();
             }
         }

@@ -8,7 +8,8 @@
 #include <memory>
 #include <iostream>
 #include <sys/eventfd.h>
-#include <cerror>
+#include <cerrno>
+#include <cstring>
 namespace adachi::tool {
     /// 非阻塞+LT模式
     EventLoop::EventLoop(int maxevents) 
@@ -23,8 +24,20 @@ namespace adachi::tool {
                 if (this->wakeupchannel_.Fd() >= 0) {
                     uint64_t one;
                     int n = read(this->wakeupchannel_.Fd(), &one, sizeof(one));
-                    if (n <= 0) {
-                        std::cout << "[Error] wakeup fail: " << strerr(errno) << std::endl;
+                    if (n != sizeof(one)) {
+                        if (n < 0) {
+                            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                                // 虚假唤醒，不是错误
+                                return;
+                            }
+                            if (errno == EINTR) {
+                            // 被信号中断，忽略即可
+                                return;
+                            }
+                            std::cout << "[Error] wakeup failed: " << strerror(errno) << std::endl;
+                        }
+                        // 真正的错误
+                        std::cout << "[Error] wakeup failed: reads " << n << " bytes instead of 8" << std::endl;
                     }
                 }
             });
