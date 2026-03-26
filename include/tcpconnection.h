@@ -30,10 +30,10 @@ namespace adachi::network {
         ~TcpConnection();
         void SaveLifeMechanism();
         std::unique_ptr<adachi::io::Channel> channel_;
-        void SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>&, adachi::io::Buffer&)>& cb);    
+        void SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>, adachi::io::Buffer&)>& cb);    
         /// 额外提供的关闭回调，如果不提供则不会进行任何操作，实际关闭时会传入被关闭对象的一个智能指针
         /// 提供额外关闭回调，请不要操作EventLoop或者tcpconnection本身的关闭操作，这些关闭操作将被自动执行
-        void SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>&)>&);    
+        void SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>)>&);    
         int Fd() const;
         bool IsWriteBufferEmpty();
 
@@ -47,8 +47,8 @@ namespace adachi::network {
         adachi::io::Buffer read_buffer_;
         adachi::io::Buffer write_buffer_;
 
-        std::function<void(const std::shared_ptr<TcpConnection>&, adachi::io::Buffer&)> onmessage_;
-        std::function<void(const std::shared_ptr<TcpConnection>&)> close_callback_;
+        std::function<void(const std::shared_ptr<TcpConnection>, adachi::io::Buffer&)> onmessage_;
+        std::function<void(const std::shared_ptr<TcpConnection>)> close_callback_;
     };
 }
 #endif // TCPCONNECTION

@@ -7,14 +7,16 @@
 #include "eventloop.h"
 #include "acceptor.h"
 namespace adachi::network {
-    Acceptor::Acceptor(adachi::tool::EventLoop* loop, const INetAddress &listenaddr, sa_family_t family) 
-        : socket_(adachi::network::Socket::CreateNonBlockSocket(family))
+    Acceptor::Acceptor(adachi::tool::EventLoop* loop, const INetAddress &listenaddr) 
+        : socket_(adachi::network::Socket::CreateNonBlockSocket())
         , accept_channel_(loop, socket_.Fd())
         , owner_(loop)
     {
         if (!socket_.BindAddress(listenaddr)) {
             std::cout << "[error] class Acceptor: BindAddress error" << std::endl;
+            return;
         }
+        accept_channel_.SetActive(adachi::io::Channel::kRead);
     }
 
     bool Acceptor::Listen(const int& backlog) {
@@ -29,7 +31,13 @@ namespace adachi::network {
         return listen_check_;
     }
 
-    void Acceptor::SetNewconnetionCallback(std::function<void()> callback) {
-        accept_channel_.SetReadCallback(callback);
+    void Acceptor::SetNewconnectionCallback(std::function<void(int, INetAddress&, int)> callback) {
+        accept_channel_.SetReadCallback([this, callback](){
+            INetAddress newlink_addr;
+            int fd = Accept(newlink_addr);
+            int saveerrno = 0;
+            if (fd < 0) saveerrno = errno;
+            callback(fd, newlink_addr, saveerrno);
+        });
     }
 }

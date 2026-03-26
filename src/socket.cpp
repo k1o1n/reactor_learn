@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include "socket.h"
+#include <iostream>
+
 namespace adachi::network {
     Socket::Socket(int fd) 
         : fd_(fd)
@@ -26,9 +28,6 @@ namespace adachi::network {
     }
 
     bool Socket::BindAddress(const INetAddress& addr) {
-        if (addr.Family() != INetAddress::IPV6 && addr.Family() != INetAddress::IPV4) {
-            return false;
-        }
         return bind(fd_, addr.GetCore(), addr.Length()) == 0;
     }
     bool Socket::Listen(const int& backlog) {
@@ -41,8 +40,13 @@ namespace adachi::network {
         return connfd;
     }
 
-    Socket Socket::CreateNonBlockSocket(sa_family_t family) {
-        int fd = socket(family, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0); 
+    Socket Socket::CreateNonBlockSocket() {
+        int fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0); 
+
+        if (fd < 0) {
+            std::cout << "[Error] Socket::CreateNonBlockSocket failed: fd < 0" << std::endl;
+        }
+
         int opt = 1;
         setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
         setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));

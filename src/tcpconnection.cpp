@@ -9,21 +9,23 @@
 #include <cstring>
 namespace adachi::network {
     TcpConnection::TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size, unsigned int write_buffer_size) 
+        
         : channel_(std::make_unique<adachi::io::Channel>(loop, fd))
         , status_(kConnecting)
         , socket_(std::make_unique<Socket>(fd))
         , read_buffer_(read_buffer_size)
         , write_buffer_(write_buffer_size)
-        , onmessage_([](const std::shared_ptr<TcpConnection>& obj, adachi::io::Buffer& buffer){
+        , onmessage_([](const std::shared_ptr<TcpConnection> obj, adachi::io::Buffer& buffer){
             std::string message;
             buffer.ReadBuffer(message);
-            // std::cout << "[info] receive " << message.size() << " bytes from fd: " << this->Fd() << std::endl;
+            std::cout << "[info] receive " << message.size() << " bytes" << std::endl;
             int saveerrno;
             obj->Write(message + " OK", saveerrno);
         })
     {
         
     }
+    /// 正常读操作完毕会默认调用onmessage进行解析
     int TcpConnection::Read(int& saveerrno) {
         if (status_ != kConnecting) return -1;
         int n = read_buffer_.ReadFd(socket_->Fd(), &saveerrno);
@@ -115,11 +117,11 @@ namespace adachi::network {
         channel_->RemoveFromLoop();
     }
 
-    void TcpConnection::SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>&, adachi::io::Buffer&)>& cb) {
+    void TcpConnection::SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>, adachi::io::Buffer&)>& cb) {
         onmessage_ = cb;
     }
 
-    void TcpConnection::SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>&)>& cb) {
+    void TcpConnection::SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>)>& cb) {
         close_callback_ = cb;
     }
 

@@ -13,6 +13,10 @@ namespace adachi::io {
         , active_events_(0)
         , owner_(nullptr)
     {
+        if (!loop) {
+            std::cout << "[info] Channel constrution failed: found nullptr" << std::endl;
+            return;
+        }
         if (!loop->AddChannel(this)) {
             std::cout << "[info] Channel constrution failed" << std::endl;
             return;

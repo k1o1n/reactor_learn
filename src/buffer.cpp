@@ -15,7 +15,7 @@ namespace adachi::io {
         vec[0].iov_base = buffer_.data() + writeptr_;
         vec[1].iov_len = 65536;
         vec[1].iov_base = extrabuf;
-        int n = readv(fd, vec, 2);
+        ssize_t n = readv(fd, vec, 2);
         if (n <= 0) {
             *saveerrno = errno;
             return n;
@@ -32,7 +32,7 @@ namespace adachi::io {
         return n;
     }
     int Buffer::WriteFd(int fd, int* saveerrno) {
-        int n = write(fd, buffer_.data() + readptr_, sizeof(char) * (writeptr_ - readptr_));
+        ssize_t n = write(fd, buffer_.data() + readptr_, sizeof(char) * (writeptr_ - readptr_));
         if (n < 0) {
             *saveerrno = errno;
             return n;

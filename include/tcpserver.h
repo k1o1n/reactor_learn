@@ -3,6 +3,7 @@
 #include "noncopyable.h"
 #include <functional>
 #include <memory>
+#include "inetaddress.h"
 namespace adachi::tool {
     class EventLoopThread;
     class EventLoop;
@@ -14,12 +15,21 @@ namespace adachi::network {
 namespace adachi::network {
     class TcpServer : adachi::tool::NonCopyAble {
     public:
-        TcpServer(std::function<void(adachi::tool::EventLoopThread*)> prework = [](adachi::tool::EventLoopThread* loop){}, int maxevents = 1024);
+        TcpServer(const INetAddress& listenaddr
+        , std::function<void(adachi::tool::EventLoopThread*)> prework = [](adachi::tool::EventLoopThread*){}
+        , int maxevents = 1024);
         void SetSubThreadNum(unsigned int num);
         void Start();
-        void SetNewConnectionCallback(std::function<void()>);
+        void SetNewconnectionCallback(std::function<void(int, INetAddress&, int)>);
     private:
+        INetAddress listenaddr_;
+    public:
         std::shared_ptr<adachi::tool::EventLoopThreadPool> pool_;
+    private:
+        std::unique_ptr<adachi::tool::EventLoopThread> acceptor_thread_;
+    public:
+        adachi::tool::EventLoop* baseloop_ = nullptr;
+    private:
         std::unique_ptr<adachi::network::Acceptor> acceptor_;
     };
 }

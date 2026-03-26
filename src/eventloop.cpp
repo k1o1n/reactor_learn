@@ -23,7 +23,7 @@ namespace adachi::tool {
             wakeupchannel_.SetReadCallback([this](){
                 if (this->wakeupchannel_.Fd() >= 0) {
                     uint64_t one;
-                    int n = read(this->wakeupchannel_.Fd(), &one, sizeof(one));
+                    ssize_t n = read(this->wakeupchannel_.Fd(), &one, sizeof(one));
                     if (n != sizeof(one)) {
                         if (n < 0) {
                             if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -82,7 +82,7 @@ namespace adachi::tool {
     void EventLoop::WakeUp() {
         if (wakeupchannel_.Fd() >= 0) {
             uint64_t one = 1;
-            int n = write(wakeupchannel_.Fd(), &one, sizeof(one));
+            ssize_t n = write(wakeupchannel_.Fd(), &one, sizeof(one));
 
             if (n != sizeof(one)) {
                // 处理错误

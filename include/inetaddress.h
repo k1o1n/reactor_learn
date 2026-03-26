@@ -6,26 +6,23 @@
 #include <arpa/inet.h>
 namespace adachi::network {
     class Socket;
+    /// 仅支持ipv4
     class INetAddress {
     public:
-        static const sa_family_t IPV4 = AF_INET;
-        static const sa_family_t IPV6 = AF_INET6;
-
         INetAddress();
-        bool SetFamily(sa_family_t family);
-        bool SetIP(const std::string& ip);
+        INetAddress(const INetAddress&);
+        INetAddress(INetAddress&&);
+        bool SetIp(const std::string& ip);
         void SetPort(const in_port_t& port);
 
-        in_port_t Port();
-        std::string Ip();
+        in_port_t Port() const;
+        std::string Ip() const;
         const sockaddr* GetCore() const;
-        sa_family_t Family() const;
         socklen_t Length() const;
     private:
         friend class Socket;
-        sockaddr_storage addr_{};
+        sockaddr_in addr_{};
         socklen_t len_;
-        sa_family_t family_;
     };
 }
 #endif // INETADDRESS_H

@@ -18,7 +18,7 @@ namespace adachi::network {
         bool Listen(const int& backlog);
         int Accept(INetAddress& addr);
 
-        static Socket CreateNonBlockSocket(sa_family_t family = AF_INET);
+        static Socket CreateNonBlockSocket();
 
         int Fd() const;
 
