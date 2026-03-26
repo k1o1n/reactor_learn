@@ -4,6 +4,7 @@
 #include <set>
 #include "adachi_network.h"
 #include <memory>
+//#include <mutex>
 
 class Ipv4TcpServer {
 public:
@@ -14,6 +15,7 @@ public:
     }
     adachi::network::TcpServer server_;
     std::set<std::shared_ptr<adachi::network::TcpConnection>> link_;
+    //std::mutex mtx_;
 };
 
 int main() {
@@ -25,16 +27,20 @@ int main() {
     server.server_.SetNewconnectionCallback([&server](int fd, adachi::network::INetAddress& addr, int saveerrno) {
         if (fd >= 0) {
             // std::cout << "[info] receive a connection from " << addr.Ip() << " " << std::endl;
-            std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(server.server_.baseloop_, fd);
+            std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(server.server_.pool_->GetOneThread(), fd);
             linkptr->SaveLifeMechanism();
-            auto it = server.link_.insert(linkptr);
+            
+            server.link_.insert(linkptr);
 
-            linkptr->channel_->SetReadCallback([ptr = *it.first]() {
+            linkptr->channel_->SetReadCallback([ptr = linkptr]() {
                 int saveerrno;
                 ptr->Read(saveerrno);
             });
             linkptr->SetCloseCallback([&server](const std::shared_ptr<adachi::network::TcpConnection> ptr) {
-                server.link_.erase(ptr);
+                //std::lock_guard<std::mutex> lock(server.mtx_);
+                server.server_.baseloop_->Submit([&server, ptr]() {
+                    server.link_.erase(ptr);
+                }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
             });
             linkptr->channel_->SetActive(adachi::io::Channel::kRead);
         }

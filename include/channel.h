@@ -15,7 +15,7 @@ namespace adachi::io {
         static constexpr int kRead = EPOLLIN;
         static constexpr int kWrite = EPOLLOUT;
         static constexpr int kError = EPOLLERR;
-        static constexpr int kClose = EPOLLRDHUP;
+        static constexpr int kClose = EPOLLRDHUP | EPOLLHUP;
         Channel(adachi::tool::EventLoop* loop, int fd);
 
         void SetReadCallback(const callback&);
