@@ -33,8 +33,7 @@ int main() {
             server.link_.insert(linkptr);
 
             linkptr->channel_->SetReadCallback([ptr = linkptr]() {
-                int saveerrno;
-                ptr->Read(saveerrno);
+                ptr->Read();
             });
             linkptr->SetCloseCallback([&server](const std::shared_ptr<adachi::network::TcpConnection> ptr) {
                 //std::lock_guard<std::mutex> lock(server.mtx_);
@@ -42,7 +41,7 @@ int main() {
                     server.link_.erase(ptr);
                 }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
             });
-            linkptr->channel_->SetActive(adachi::io::Channel::kRead);
+            linkptr->channel_->SetActive(adachi::io::Channel::kRead | adachi::io::Channel::kClose);
         }
         else {
             std::cout << "[Error] connection failed: " << strerror(saveerrno) << std::endl;

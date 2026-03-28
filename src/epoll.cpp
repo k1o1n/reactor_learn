@@ -77,6 +77,7 @@ namespace adachi::io {
         return true;
     }
     bool Epoll::DeleteChannel(Channel* channel) {
+        if (!channel) return false;
         if (channel->owner_ != owner_) return false;
         epoll_event newevent;
         newevent.data.ptr = static_cast<void*>(channel);

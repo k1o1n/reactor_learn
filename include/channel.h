@@ -54,7 +54,9 @@ namespace adachi::io {
         int fd_;
         int events_;
         int active_events_;
+    public:
         adachi::tool::EventLoop* owner_; 
+    private:
         bool tied_ = false;
     };
 }

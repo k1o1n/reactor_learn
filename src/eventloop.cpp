@@ -126,4 +126,8 @@ namespace adachi::tool {
             WakeUp();
         }
     }
+
+    bool EventLoop::IsInThread() {
+        return tid_ == std::this_thread::get_id();
+    }
 }

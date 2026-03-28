@@ -21,15 +21,14 @@ namespace adachi::network {
     class TcpConnection : adachi::tool::NonCopyAble, public std::enable_shared_from_this<TcpConnection> {
     public:
         TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size = 1024, unsigned int write_buffer_size = 1024);
-        int Read(int&);
+        void Read();
         /// 发送信息，未发送成功的信息存在缓冲区，并设置epoll开始关注可写事件
-        int Write(const std::string& message, int& saveerrno);
+        void Write(std::string message);
         /// 尝试发送可写缓冲区信息到对应描述符
-        int WriteFd(int* saveerrno);
+        void WriteFd();
         void Close();
         ~TcpConnection();
         void SaveLifeMechanism();
-        std::unique_ptr<adachi::io::Channel> channel_;
         void SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>, adachi::io::Buffer&)>& cb);    
         /// 额外提供的关闭回调，如果不提供则不会进行任何操作，实际关闭时会传入被关闭对象的一个智能指针
         /// 提供额外关闭回调，请不要操作EventLoop或者tcpconnection本身的关闭操作，这些关闭操作将被自动执行
@@ -37,7 +36,12 @@ namespace adachi::network {
         int Fd() const;
         bool IsWriteBufferEmpty();
 
+        std::unique_ptr<adachi::io::Channel> channel_;
+
     private:
+        void WriteInThread(std::string);
+        void CloseInThread();
+
         enum connectionstate {
             kConnecting,
             kDisConnecting,

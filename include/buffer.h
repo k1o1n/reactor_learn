@@ -10,8 +10,8 @@ namespace adachi::io {
     class Buffer : adachi::tool::NonCopyAble {
     public:
         Buffer(int size = 1024);
-        int ReadFd(int fd, int* saveerrno);
-        int WriteFd(int fd, int* saveerrno);
+        int ReadFd(int fd, int& saveerrno);
+        int WriteFd(int fd, int& saveerrno);
         void WriteBuffer(const std::string& message);
         void WriteBuffer(const char* message, unsigned int len);
         void ReadBuffer(std::string& message);

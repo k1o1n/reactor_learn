@@ -34,6 +34,8 @@ namespace adachi::tool {
         void DoCrossThreadMission();
 
         void Submit(const std::function<void()>& cb);
+
+        bool IsInThread();
     private:
         adachi::io::Epoll epoll_;
         std::atomic<bool> quit_;    
