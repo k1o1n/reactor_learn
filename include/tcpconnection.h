@@ -8,6 +8,7 @@
 #include <memory>
 #include <functional>
 #include <cerrno>
+#include <atomic>
 
 namespace adachi::tool {
     class EventLoop;
@@ -31,6 +32,8 @@ namespace adachi::network {
         void Close();
         ~TcpConnection();
         void SaveLifeMechanism();
+
+        /// 需要保证io在原线程上，防止数据竞态
         void SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>, adachi::io::Buffer&)>& cb);    
         /// 额外提供的关闭回调，如果不提供则不会进行任何操作，实际关闭时会传入被关闭对象的一个智能指针
         /// 提供额外关闭回调，请不要操作EventLoop或者tcpconnection本身的关闭操作，这些关闭操作将被自动执行
@@ -49,6 +52,7 @@ namespace adachi::network {
             kDisConnecting,
             kDisConnected
         } status_;
+        std::atomic<bool> close_requested_{false};
         std::unique_ptr<Socket> socket_;
         adachi::io::Buffer read_buffer_;
         adachi::io::Buffer write_buffer_;

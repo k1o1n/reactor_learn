@@ -44,10 +44,6 @@ namespace adachi::network {
                 linkptr->SaveLifeMechanism();
                 
                 server->tcpst_.insert(linkptr);
-
-                linkptr->channel_->SetReadCallback([linkptr]() {
-                    linkptr->Read();
-                });
                 linkptr->SetCloseCallback([server, closecallback = server->closecallback_](std::shared_ptr<TcpConnection> linkptr) {
                     //std::lock_guard<std::mutex> lock(server.mtx_);
                     closecallback(linkptr);
@@ -55,7 +51,6 @@ namespace adachi::network {
                         server->tcpst_.erase(linkptr);
                     }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
                 });
-                linkptr->channel_->SetActive(linkptr->channel_->Events() | adachi::io::Channel::kClose);
                 callback(linkptr);
             }
             else {

@@ -3,6 +3,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <cerrno>
+
 namespace adachi::io {
     Buffer::Buffer(int size) {
         readptr_ = writeptr_ = 0;
@@ -61,6 +62,14 @@ namespace adachi::io {
         message.assign(buffer_.data() + readptr_, writeptr_ - readptr_);
         readptr_ = writeptr_ = 0;
     }
+    void Buffer::ReadBuffer(std::string& message, size_t len) {
+        if (Size() < len) {
+            throw "len is bigger than Buffer::Size()\n";
+        }
+        message.assign(buffer_.data() + readptr_, len);
+        if (Size() == len) readptr_ = writeptr_ = 0;
+        else readptr_ += len;
+    }
     void Buffer::MovePtr() {
         if (readptr_) {
             std::memmove(buffer_.data(), buffer_.data() + readptr_, sizeof(char) * (writeptr_ - readptr_));
@@ -76,5 +85,19 @@ namespace adachi::io {
     }
     bool Buffer::Empty() {
         return readptr_ == writeptr_;
+    }
+
+    size_t Buffer::Capacity() {
+        return buffer_.size();
+    }
+    size_t Buffer::Size() {
+        return writeptr_ - readptr_;
+    }
+
+    unsigned int Buffer::PeekUnsignedInt() {
+        if (Size() < sizeof(unsigned int)) throw "Size() is smaller than sizeof(unsigned int)\n";
+        unsigned int v;
+        std::memmove(&v, buffer_.data() + readptr_, sizeof(unsigned int));
+        return v;
     }
 }

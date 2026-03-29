@@ -18,7 +18,10 @@ struct ClientState {
     bool connected;
 
     ClientState(int _fd) : fd(_fd), bytes_sent(0), connected(false) {
-        msg_to_send = "Hello from client " + std::to_string(fd) + "\n";
+        std::string payload = "Hello from client " + std::to_string(fd) + "\n";
+        uint32_t payload_len = static_cast<uint32_t>(payload.size());
+        msg_to_send.assign(reinterpret_cast<const char*>(&payload_len), sizeof(payload_len));
+        msg_to_send += payload;
     }
     ~ClientState() {
         if (fd != -1) ::close(fd);

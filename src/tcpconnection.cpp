@@ -49,7 +49,9 @@ namespace adachi::network {
         int n = read_buffer_.ReadFd(socket_->Fd(), saveerrno);
 
         if (n > 0) {
-            onmessage_(shared_from_this(), read_buffer_);
+            if (auto self = weak_from_this().lock()) {
+                onmessage_(self, read_buffer_);
+            }
         }
         else if (n == 0) {
             Close();
@@ -72,9 +74,11 @@ namespace adachi::network {
                     WriteInThread(std::move(message));
                 }
                 else {
-                    auto ptr = shared_from_this();
-                    channel_->owner_->Submit([ptr, msg = std::move(message)]() mutable {
-                        ptr->WriteInThread(std::move(msg));
+                    auto weak_self = weak_from_this();
+                    channel_->owner_->Submit([weak_self, msg = std::move(message)]() mutable {
+                        if (auto self = weak_self.lock()) {
+                            self->WriteInThread(std::move(msg));
+                        }
                     });
                 }
             }
@@ -103,24 +107,26 @@ namespace adachi::network {
             
             if (status_ == kDisConnecting) {
                 status_ = kDisConnected;
-                auto ptr = shared_from_this();
-                if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
+                auto self = weak_from_this().lock();
+                if (self && close_callback_) close_callback_(self); // 上层关闭（如果有提供）
                 channel_->RemoveFromLoop(); // 关闭所在epoll
                 socket_->Close();
-                Close();
             }
         }
     }
     void TcpConnection::Close() {
+        if (close_requested_.exchange(true)) return;
         if (channel_) {
             if (channel_->owner_) {
                 if (channel_->owner_->IsInThread()) {
                     CloseInThread();
                 }
                 else {
-                    auto ptr = shared_from_this();
-                    channel_->owner_->Submit([ptr]() {
-                        ptr->CloseInThread();
+                    auto weak_self = weak_from_this();
+                    channel_->owner_->Submit([weak_self]() {
+                        if (auto self = weak_self.lock()) {
+                            self->CloseInThread();
+                        }
                     });
                 }
             }
@@ -134,7 +140,9 @@ namespace adachi::network {
     }
 
     void TcpConnection::SaveLifeMechanism() {
-        channel_->Tie(shared_from_this());
+        if (auto self = weak_from_this().lock()) {
+            channel_->Tie(self);
+        }
     }
 
     TcpConnection::~TcpConnection() {
@@ -193,10 +201,10 @@ namespace adachi::network {
         if (status_ == kDisConnected) return;
         if (write_buffer_.Empty()) {
             status_ = kDisConnected;
-            auto ptr = shared_from_this();
+            auto self = weak_from_this().lock();
             channel_->RemoveFromLoop(); // 关闭所在epoll
             socket_->Close();
-            if (close_callback_) close_callback_(ptr); // 上层关闭（如果有提供）
+            if (self && close_callback_) close_callback_(self); // 上层关闭（如果有提供）
         }
         else {
             status_ = kDisConnecting;

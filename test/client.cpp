@@ -31,6 +31,10 @@ int main(int argc, char* argv[]) {
     }
 
     std::string msg = "Hello from simple client!";
+    unsigned int len = msg.size();
+    std::string headstr;
+    headstr.assign(reinterpret_cast<char*>(&len), sizeof(len));
+    msg = headstr + msg;
     if (send(sock, msg.c_str(), msg.length(), 0) == -1) {
         perror("send");
         close(sock);
