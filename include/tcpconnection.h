@@ -8,9 +8,11 @@
 #include <memory>
 #include <functional>
 #include <cerrno>
+
 namespace adachi::tool {
     class EventLoop;
 }
+
 namespace adachi::network {
     /// 必须显式调用SaveLifeMechanism()保活机制才能开始使用，否则运行中可能出现问题，或者尝试使用工厂模式批量生产
     /// 表示一个tcp连接，提供一个OnMessage消息处理机制，同时后续可以设定CloseCallback关闭回调提供额外的操作。
@@ -32,7 +34,7 @@ namespace adachi::network {
         void SetOnMessage(const std::function<void(const std::shared_ptr<TcpConnection>, adachi::io::Buffer&)>& cb);    
         /// 额外提供的关闭回调，如果不提供则不会进行任何操作，实际关闭时会传入被关闭对象的一个智能指针
         /// 提供额外关闭回调，请不要操作EventLoop或者tcpconnection本身的关闭操作，这些关闭操作将被自动执行
-        void SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>)>&);    
+        void SetCloseCallback(const std::function<void(std::shared_ptr<TcpConnection>)>&);    
         int Fd() const;
         bool IsWriteBufferEmpty();
 

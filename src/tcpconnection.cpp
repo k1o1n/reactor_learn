@@ -31,6 +31,16 @@ namespace adachi::network {
         channel_->SetWriteCallback([ptr = this]() {
             ptr->WriteFd();
         });
+
+        channel_->SetErrorCallback([ptr = this]() {
+            ptr->Close();
+        });
+
+        channel_->SetCloseCallback([ptr = this]() {
+            ptr->Close();
+        });
+
+        channel_->SetActive(adachi::io::Channel::kRead | adachi::io::Channel::kClose);
     }
     /// 正常读操作完毕会默认调用onmessage进行解析
     void TcpConnection::Read() {
@@ -136,7 +146,7 @@ namespace adachi::network {
         onmessage_ = cb;
     }
 
-    void TcpConnection::SetCloseCallback(const std::function<void(const std::shared_ptr<TcpConnection>)>& cb) {
+    void TcpConnection::SetCloseCallback(const std::function<void(std::shared_ptr<TcpConnection>)>& cb) {
         close_callback_ = cb;
     }
 

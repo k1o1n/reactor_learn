@@ -62,6 +62,13 @@ namespace adachi::tool {
         while (!quit_.load()) {
             // std::lock_guard<std::mutex> lock(mtx_);
             int siz = epoll_.Poll(&active_list, 100, epoll_.epoll_list_.size());
+            if (siz < 0) {
+                if (errno == EINTR || errno == EWOULDBLOCK || errno == EAGAIN) {
+                    continue;
+                }
+                std::cerr << "[Error] epoll_wait failed: " << strerror(errno) << std::endl;
+                break;
+            }
             for (int idx = 0; idx < siz; ++idx) active_list[idx]->Handle();
             DoCrossThreadMission();
         }
