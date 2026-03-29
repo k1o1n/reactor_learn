@@ -62,8 +62,9 @@ namespace adachi::network {
                     WriteInThread(std::move(message));
                 }
                 else {
-                    channel_->owner_->Submit([this, msg = std::move(message)]() mutable {
-                        WriteInThread(std::move(msg));
+                    auto ptr = shared_from_this();
+                    channel_->owner_->Submit([ptr, msg = std::move(message)]() mutable {
+                        ptr->WriteInThread(std::move(msg));
                     });
                 }
             }
@@ -107,8 +108,9 @@ namespace adachi::network {
                     CloseInThread();
                 }
                 else {
-                    channel_->owner_->Submit([this]() {
-                        CloseInThread();
+                    auto ptr = shared_from_this();
+                    channel_->owner_->Submit([ptr]() {
+                        ptr->CloseInThread();
                     });
                 }
             }
