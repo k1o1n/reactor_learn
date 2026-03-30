@@ -34,10 +34,10 @@ namespace adachi::tool {
                             // 被信号中断，忽略即可
                                 return;
                             }
-                            std::cout << "[Error] wakeup failed: " << strerror(errno) << std::endl;
+                            // std::cout << "[Error] wakeup failed: " << strerror(errno) << std::endl;
                         }
                         // 真正的错误
-                        std::cout << "[Error] wakeup failed: reads " << n << " bytes instead of 8" << std::endl;
+                        // std::cout << "[Error] wakeup failed: reads " << n << " bytes instead of 8" << std::endl;
                     }
                 }
             });

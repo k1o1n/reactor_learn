@@ -44,7 +44,7 @@ namespace adachi::network {
         int fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0); 
 
         if (fd < 0) {
-            std::cout << "[Error] Socket::CreateNonBlockSocket failed: fd < 0" << std::endl;
+            // std::cout << "[Error] Socket::CreateNonBlockSocket failed: fd < 0" << std::endl;
         }
 
         int opt = 1;

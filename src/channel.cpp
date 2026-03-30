@@ -14,11 +14,11 @@ namespace adachi::io {
         , owner_(nullptr)
     {
         if (!loop) {
-            std::cout << "[info] Channel constrution failed: found nullptr" << std::endl;
+            // std::cout << "[info] Channel constrution failed: found nullptr" << std::endl;
             return;
         }
         if (!loop->AddChannel(this)) {
-            std::cout << "[info] Channel constrution failed" << std::endl;
+            // std::cout << "[info] Channel constrution failed" << std::endl;
             return;
         }
         owner_ = loop;
@@ -51,11 +51,11 @@ namespace adachi::io {
     Channel* Channel::SetActive(const int& status) {
         events_ = status;
         if (!owner_) {
-            std::cout << "[info] SetActive failed: events set successfully but owner eventloop not found" << std::endl;
+            // std::cout << "[info] SetActive failed: events set successfully but owner eventloop not found" << std::endl;
             return this;
         }
         if (!owner_->UpdateChannel(this)) {
-            std::cout << "[info] SetActive failed" << std::endl;
+            // std::cout << "[info] SetActive failed" << std::endl;
         }
         return this;
     }

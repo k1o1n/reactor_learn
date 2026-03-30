@@ -31,7 +31,7 @@ namespace adachi::network {
             pool_->Start();
         }
         else {
-            std::cout << "[Error] TcpServer Start failed: acceptor_thread_->Start() return nullptr" << std::endl;
+            // std::cout << "[Error] TcpServer Start failed: acceptor_thread_->Start() return nullptr" << std::endl;
         }   
     }
 
@@ -54,7 +54,8 @@ namespace adachi::network {
                 callback(linkptr);
             }
             else {
-                std::cout << "[Error] connection failed: " << strerror(saveerrno) << std::endl;
+                strerror(saveerrno);
+                // std::cout << "[Error] connection failed: " << strerror(saveerrno) << std::endl;
             }
         });
     }   

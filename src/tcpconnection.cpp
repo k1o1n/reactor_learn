@@ -22,7 +22,7 @@ namespace adachi::network {
                 unsigned int len = ntohl(buffer.PeekUnsignedInt()); /// 数据为大端类型需要转换
                 // unsigned int len = buffer.PeekUnsignedInt();
                 if (len > 100000) {
-                    std::cout << "[Info] buffer size exceeded 100000 * sizeof(char).TcpConnection will be closed soonly" << std::endl;
+                    // std::cout << "[Info] buffer size exceeded 100000 * sizeof(char).TcpConnection will be closed soonly" << std::endl;
                     conn_ptr->Close();
                     break;
                 }
@@ -33,7 +33,7 @@ namespace adachi::network {
                         buffer.ReadBuffer(header, sizeof(unsigned int));
                         buffer.ReadBuffer(message, len);
 
-                        std::cout << "receieve message: " << message << std::endl;
+                        // std::cout << "receieve message: " << message << std::endl;
 
                         message += " OK!";
                         unsigned int v = htonl(message.size());
@@ -83,7 +83,7 @@ namespace adachi::network {
 
             }
             else {
-                std::cout << "[Error] TcpConnection Read failed: " << strerror(saveerrno) << std::endl;
+                // std::cout << "[Error] TcpConnection Read failed: " << strerror(saveerrno) << std::endl;
                 Close();
             }
         }
@@ -106,11 +106,11 @@ namespace adachi::network {
                 }
             }
             else {
-                std::cout << "[Error] TcpConnection::Write failed: channel->owner_ is nullptr" << std::endl;
+                // std::cout << "[Error] TcpConnection::Write failed: channel->owner_ is nullptr" << std::endl;
             }
         }
         else {
-            std::cout << "[Error] TcpConnection::Write failed: channel is nullptr" << std::endl;
+            // std::cout << "[Error] TcpConnection::Write failed: channel is nullptr" << std::endl;
         }
     }
     void TcpConnection::WriteFd() {
@@ -120,7 +120,7 @@ namespace adachi::network {
         
         if (n < 0) {
             if (saveerrno != EAGAIN && saveerrno != EWOULDBLOCK && saveerrno != EINTR) {
-                std::cout << "[Error] TcpConnection::WriteFd failed: " << strerror(saveerrno) << std::endl;
+                // std::cout << "[Error] TcpConnection::WriteFd failed: " << strerror(saveerrno) << std::endl;
                 Close();
             }
         }
@@ -154,11 +154,11 @@ namespace adachi::network {
                 }
             }
             else {
-                std::cout << "[Error] TcpConnection::Write failed: channel->owner_ is nullptr" << std::endl;
+                // std::cout << "[Error] TcpConnection::Write failed: channel->owner_ is nullptr" << std::endl;
             }
         }
         else {
-            std::cout << "[Error] TcpConnection::Write failed: channel is nullptr" << std::endl;
+            // std::cout << "[Error] TcpConnection::Write failed: channel is nullptr" << std::endl;
         }
     }
 
@@ -203,7 +203,7 @@ namespace adachi::network {
             else {
                 saveerrno = errno;
                 if (saveerrno != EAGAIN && saveerrno != EWOULDBLOCK && saveerrno != EINTR) {
-                    std::cout << "[Error] TcpConnection::write failed: " << strerror(saveerrno) << std::endl;
+                    // std::cout << "[Error] TcpConnection::write failed: " << strerror(saveerrno) << std::endl;
                     CloseInThread();
                 }
                 else {

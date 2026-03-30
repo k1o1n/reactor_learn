@@ -17,7 +17,8 @@ namespace adachi::network {
 }
 
 namespace adachi::network {
-    class TcpServer : adachi::tool::NonCopyAble {
+    /// WARNING: TcpServer 的生命周期必须长于所有 TcpConnection，否则其内部回调会引发 Use-After-Free 悬垂指针崩溃！
+    class TcpServer : adachi::tool::NonCopyAble, public std::enable_shared_from_this<TcpServer> {
     public:
         TcpServer(const INetAddress& listenaddr
         , std::function<void(adachi::tool::EventLoopThread*)> prework = [](adachi::tool::EventLoopThread*){}

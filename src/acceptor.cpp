@@ -13,7 +13,7 @@ namespace adachi::network {
         , owner_(loop)
     {
         if (!socket_.BindAddress(listenaddr)) {
-            std::cout << "[error] class Acceptor: BindAddress error" << std::endl;
+            // std::cout << "[error] class Acceptor: BindAddress error" << std::endl;
             return;
         }
         accept_channel_.SetActive(adachi::io::Channel::kRead);
