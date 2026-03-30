@@ -23,8 +23,13 @@ namespace adachi::tool {
     }
     EventLoopThread::~EventLoopThread() {
         exiting_ = false;
-        if (loop_ != nullptr) {
-            loop_->StopLoop();
+        EventLoop* loop = nullptr;
+        {
+            std::lock_guard<std::mutex> lock(mtx_);
+            loop = loop_;
+        }
+        if (loop != nullptr) {
+            loop->StopLoop();
         }
         
         if (thread_.joinable()) thread_.join();
