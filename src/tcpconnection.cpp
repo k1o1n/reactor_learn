@@ -24,6 +24,7 @@ namespace adachi::network {
                 if (len > 100000) {
                     std::cout << "[Info] buffer size exceeded 100000 * sizeof(char).TcpConnection will be closed soonly" << std::endl;
                     conn_ptr->Close();
+                    break;
                 }
                 else {
                     if (buffer.Size() >= len + sizeof(unsigned int)) {
@@ -41,6 +42,7 @@ namespace adachi::network {
 
                         conn_ptr->Write(msgback + message);
                     }
+                    else break;
                 }
             }
         })
