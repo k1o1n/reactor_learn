@@ -18,7 +18,7 @@ namespace adachi::network {
         , read_buffer_(read_buffer_size)
         , write_buffer_(write_buffer_size)
         , onmessage_([](std::shared_ptr<adachi::network::TcpConnection> conn_ptr, adachi::io::Buffer& buffer){
-            if (buffer.Size() >= sizeof(unsigned int)) {
+            while (buffer.Size() >= sizeof(unsigned int)) {
                 unsigned int len = ntohl(buffer.PeekUnsignedInt()); /// 数据为大端类型需要转换
                 // unsigned int len = buffer.PeekUnsignedInt();
                 if (len > 100000) {
@@ -34,6 +34,12 @@ namespace adachi::network {
 
                         std::cout << "receieve message: " << message << std::endl;
 
+                        message += " OK!";
+                        unsigned int v = htonl(message.size());
+                        std::string msgback;
+                        msgback.assign(reinterpret_cast<char*>(&v), sizeof(v));
+
+                        conn_ptr->Write(msgback + message);
                     }
                 }
             }

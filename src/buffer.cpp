@@ -3,6 +3,7 @@
 #include <sys/uio.h>
 #include <unistd.h>
 #include <cerrno>
+#include <stdexcept>
 
 namespace adachi::io {
     Buffer::Buffer(int size) {
@@ -64,7 +65,7 @@ namespace adachi::io {
     }
     void Buffer::ReadBuffer(std::string& message, size_t len) {
         if (Size() < len) {
-            throw "len is bigger than Buffer::Size()\n";
+            throw std::out_of_range("len is bigger than Buffer::Size()\n");
         }
         message.assign(buffer_.data() + readptr_, len);
         if (Size() == len) readptr_ = writeptr_ = 0;
@@ -95,7 +96,7 @@ namespace adachi::io {
     }
 
     unsigned int Buffer::PeekUnsignedInt() {
-        if (Size() < sizeof(unsigned int)) throw "Size() is smaller than sizeof(unsigned int)\n";
+        if (Size() < sizeof(unsigned int)) throw std::out_of_range("Size() is smaller than sizeof(unsigned int)\n");
         unsigned int v;
         std::memmove(&v, buffer_.data() + readptr_, sizeof(unsigned int));
         return v;
