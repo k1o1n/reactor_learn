@@ -20,6 +20,7 @@ struct ClientState {
     ClientState(int _fd) : fd(_fd), bytes_sent(0), connected(false) {
         std::string payload = "Hello from client " + std::to_string(fd) + "\n";
         uint32_t payload_len = static_cast<uint32_t>(payload.size());
+        payload_len = htonl(payload_len);
         msg_to_send.assign(reinterpret_cast<const char*>(&payload_len), sizeof(payload_len));
         msg_to_send += payload;
     }

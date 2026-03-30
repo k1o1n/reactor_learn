@@ -19,7 +19,7 @@ namespace adachi::network {
         , write_buffer_(write_buffer_size)
         , onmessage_([](std::shared_ptr<adachi::network::TcpConnection> conn_ptr, adachi::io::Buffer& buffer){
             if (buffer.Size() >= sizeof(unsigned int)) {
-                unsigned int len = buffer.PeekUnsignedInt();
+                unsigned int len = ntohl(buffer.PeekUnsignedInt()); /// 数据为大端类型需要转换
                 // unsigned int len = buffer.PeekUnsignedInt();
                 if (len > 100000) {
                     std::cout << "[Info] buffer size exceeded 100000 * sizeof(char).TcpConnection will be closed soonly" << std::endl;
