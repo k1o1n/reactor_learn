@@ -17,11 +17,26 @@ namespace adachi::network {
         , socket_(std::make_unique<Socket>(fd))
         , read_buffer_(read_buffer_size)
         , write_buffer_(write_buffer_size)
-        , onmessage_([](const std::shared_ptr<TcpConnection> obj, adachi::io::Buffer& buffer){
-            std::string message;
-            buffer.ReadBuffer(message);
-            std::cout << "[info] receive " << message.size() << " bytes" << std::endl;
-            obj->Write(message + " OK");
+        , onmessage_([](std::shared_ptr<adachi::network::TcpConnection> conn_ptr, adachi::io::Buffer& buffer){
+            if (buffer.Size() >= sizeof(unsigned int)) {
+                unsigned int len = buffer.PeekUnsignedInt();
+                // unsigned int len = buffer.PeekUnsignedInt();
+                if (len > 100000) {
+                    std::cout << "[Info] buffer size exceeded 100000 * sizeof(char).TcpConnection will be closed soonly" << std::endl;
+                    conn_ptr->Close();
+                }
+                else {
+                    if (buffer.Size() >= len + sizeof(unsigned int)) {
+                        std::string header;
+                        std::string message;
+                        buffer.ReadBuffer(header, sizeof(unsigned int));
+                        buffer.ReadBuffer(message, len);
+
+                        std::cout << "receieve message: " << message << std::endl;
+
+                    }
+                }
+            }
         })
     {
         channel_->SetReadCallback([ptr = this]() {
