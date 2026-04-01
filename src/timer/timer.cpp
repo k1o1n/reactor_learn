@@ -54,19 +54,18 @@ namespace adachi::io {
         ptr_ = (ptr_ + 1) % timerwheel_st_.size();
     } 
 
-    void Timer::Insert(std::weak_ptr<adachi::tool::HeartBeatObj> tcp_weak_ptr) {
-        if (auto ptr = tcp_weak_ptr.lock()) {
-            if (timer_channel_->owner_->IsInThread()) {
+    void Timer::Insert(const std::shared_ptr<adachi::tool::HeartBeatObj>& ptr) {
+        if (!ptr) {
+            return;
+        }
+        if (timer_channel_->owner_->IsInThread()) {
+            InsertInThread(ptr);
+        }
+        else {
+            timer_channel_->owner_->Submit([ptr, this]() {
                 InsertInThread(ptr);
-            }
-            else {
-                timer_channel_->owner_->Submit([tcp_weak_ptr, this]() {
-                    if (auto ptr = tcp_weak_ptr.lock()) {
-                        InsertInThread(ptr);
-                    }
-                });
-            } 
-        }   
+            });
+        }
     }
 
     void Timer::InsertInThread(std::shared_ptr<adachi::tool::HeartBeatObj> ptr) {

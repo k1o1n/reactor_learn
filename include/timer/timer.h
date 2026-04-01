@@ -27,7 +27,7 @@ namespace adachi::io {
         Timer(adachi::tool::EventLoop* owner, int heartbeat_num, timespec timeslice);
         ~Timer();
         /// 严格执行eventloop的非跨线程思想，插入将会提交到对应的线程进行处理
-        void Insert(std::weak_ptr<adachi::tool::HeartBeatObj>);
+        void Insert(const std::shared_ptr<adachi::tool::HeartBeatObj>&);
     private:
         void Tick();
         void InsertInThread(std::shared_ptr<adachi::tool::HeartBeatObj>);

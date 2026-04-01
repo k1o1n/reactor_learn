@@ -38,31 +38,29 @@ namespace adachi::network {
     }
 
     void TcpServer::SetNewconnectionCallback(std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> callback) {
-        acceptor_->SetNewconnectionCallback([server_ptr = weak_from_this(), callback = std::move(callback), isheartbeat = isheartbeat_](int fd, adachi::network::INetAddress& addr, int saveerrno) {
-            if (auto server = server_ptr.lock()) {
-                if (fd >= 0) {
-                    // std::cout << "[info] receive a connection from " << addr.Ip() << " " << std::endl;
-                    addr.Ip();
-                    std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(server->pool_->GetOneThread(), fd);
+        acceptor_->SetNewconnectionCallback([this, callback = std::move(callback), isheartbeat = isheartbeat_](int fd, adachi::network::INetAddress& addr, int saveerrno) {
+            if (fd >= 0) {
+                // std::cout << "[info] receive a connection from " << addr.Ip() << " " << std::endl;
+                addr.Ip();
+                std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(pool_->GetOneThread(), fd);
+                if (isheartbeat) {
                     linkptr->SaveLifeMechanism();
-                    
-                    server->tcpst_.insert(linkptr);
-                    linkptr->SetCloseCallback([server_ptr, closecallback = server->closecallback_](std::shared_ptr<TcpConnection> linkptr) {
-                        //std::lock_guard<std::mutex> lock(server.mtx_);
-                        if (auto server = server_ptr.lock()) {
-                            closecallback(linkptr);
-                            server->baseloop_->Submit([server, linkptr]() {
-                                server->tcpst_.erase(linkptr);
-                            }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
-                        }
-                    });
+                }
 
-                    callback(linkptr);
-                }
-                else {
-                    strerror(saveerrno);
-                    // std::cout << "[Error] connection failed: " << strerror(saveerrno) << std::endl;
-                }
+                tcpst_.insert(linkptr);
+                linkptr->SetCloseCallback([this, closecallback = closecallback_](std::shared_ptr<TcpConnection> linkptr) {
+                    //std::lock_guard<std::mutex> lock(server.mtx_);
+                    closecallback(linkptr);
+                    baseloop_->Submit([this, linkptr]() {
+                        tcpst_.erase(linkptr);
+                    }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
+                });
+
+                callback(linkptr);
+            }
+            else {
+                strerror(saveerrno);
+                // std::cout << "[Error] connection failed: " << strerror(saveerrno) << std::endl;
             }
         });
     }   
