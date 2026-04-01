@@ -53,6 +53,7 @@ namespace adachi::network {
         std::unordered_set<std::shared_ptr<adachi::network::TcpConnection>> tcpst_;
 
         std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> closecallback_ = [](std::shared_ptr<adachi::network::TcpConnection>) {};
+        bool isheartbeat_;
     };
 }
 #endif // TCPSERVER_H

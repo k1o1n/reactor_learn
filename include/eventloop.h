@@ -53,6 +53,7 @@ namespace adachi::tool {
         adachi::io::Channel wakeupchannel_;
         std::vector<std::function<void()>> missions_;
         std::thread::id tid_;
+    public:
         std::unique_ptr<adachi::io::Timer> timerptr_;
     };
 }

@@ -18,6 +18,7 @@ namespace adachi::network {
         , acceptor_thread_(std::make_unique<adachi::tool::EventLoopThread>(timeropt, prework, maxevents))
         , baseloop_(acceptor_thread_->Start())
         , acceptor_(std::make_unique<adachi::network::Acceptor>(baseloop_, listenaddr))
+        , isheartbeat_(timeropt.heartbeat_num_ > 0)
     {
         SetSubThreadNum(1);
         SetNewconnectionCallback([](std::shared_ptr<adachi::network::TcpConnection>) {});
@@ -37,7 +38,7 @@ namespace adachi::network {
     }
 
     void TcpServer::SetNewconnectionCallback(std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> callback) {
-        acceptor_->SetNewconnectionCallback([server_ptr = weak_from_this(), callback = std::move(callback)](int fd, adachi::network::INetAddress& addr, int saveerrno) {
+        acceptor_->SetNewconnectionCallback([server_ptr = weak_from_this(), callback = std::move(callback), isheartbeat = isheartbeat_](int fd, adachi::network::INetAddress& addr, int saveerrno) {
             if (auto server = server_ptr.lock()) {
                 if (fd >= 0) {
                     // std::cout << "[info] receive a connection from " << addr.Ip() << " " << std::endl;
@@ -55,6 +56,7 @@ namespace adachi::network {
                             }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
                         }
                     });
+
                     callback(linkptr);
                 }
                 else {

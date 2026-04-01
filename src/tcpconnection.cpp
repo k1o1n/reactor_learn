@@ -72,6 +72,13 @@ namespace adachi::network {
         int n = read_buffer_.ReadFd(socket_->Fd(), saveerrno);
 
         if (n > 0) {
+
+            /// 有shared指针管理，说明心跳机制正常运行，延长生命周期
+            /// 没有shared指针管理，说明心跳机制没开启或者连接已经超时
+            if (heartbeat_ptr_.use_count()) {
+                channel_->owner_->timerptr_->Insert(heartbeat_ptr_);
+            }
+
             if (auto self = weak_from_this().lock()) {
                 onmessage_(self, read_buffer_);
             }
@@ -166,6 +173,12 @@ namespace adachi::network {
     void TcpConnection::SaveLifeMechanism() {
         if (auto self = weak_from_this().lock()) {
             channel_->Tie(self);
+
+            if (channel_->owner_->timerptr_) {
+                std::shared_ptr<adachi::tool::HeartBeatObj> ptr = std::make_shared<adachi::tool::HeartBeatObj>(weak_from_this());
+                heartbeat_ptr_ = ptr;
+                channel_->owner_->timerptr_->Insert(heartbeat_ptr_);
+            }
         }
     }
 
