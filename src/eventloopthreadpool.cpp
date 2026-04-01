@@ -3,9 +3,12 @@
 #include <algorithm>
 
 namespace adachi::tool {
-    EventLoopThreadPool::EventLoopThreadPool(std::function<void(EventLoopThread*)> prework, int maxevents) 
+    EventLoopThreadPool::EventLoopThreadPool(const adachi::io::TimerOpt& timeropt
+    , std::function<void(EventLoopThread*)> prework
+    , int maxevents) 
         : maxevents_(maxevents)
         , prework_(prework)
+        , timeropt_(timeropt.heartbeat_num_, timeropt.timeslice_)
     {
 
     }
@@ -30,7 +33,7 @@ namespace adachi::tool {
         threads_.resize(num_);
         oper_threads_.resize(num_);
         for (unsigned int idx = 0; idx < num_; ++idx) {
-            threads_[idx] = std::make_unique<EventLoopThread>(prework_, maxevents_);
+            threads_[idx] = std::make_unique<EventLoopThread>(timeropt_, prework_, maxevents_);
             oper_threads_[idx] = threads_[idx]->Start();
         }
         running_ = true;

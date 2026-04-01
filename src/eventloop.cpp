@@ -10,14 +10,17 @@
 #include <sys/eventfd.h>
 #include <cerrno>
 #include <cstring>
+#include "timer/timer.h"
+
 namespace adachi::tool {
     /// 非阻塞+LT模式
-    EventLoop::EventLoop(int maxevents) 
+    EventLoop::EventLoop(const adachi::io::TimerOpt& timeropt, int maxevents) 
         : epoll_(this, maxevents)
         , quit_(false)
         , looping_(false)
         , wakeupchannel_(this, eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC))
         , tid_(std::this_thread::get_id())
+        , timerptr_(nullptr)
     {
         if (wakeupchannel_.Fd() >= 0) {
             wakeupchannel_.SetReadCallback([this](){
@@ -42,6 +45,10 @@ namespace adachi::tool {
                 }
             });
             wakeupchannel_.SetActive(adachi::io::Channel::kRead);
+        }
+
+        if (timeropt.heartbeat_num_ > 0) {
+            timerptr_ = std::make_unique<adachi::io::Timer>(this, timeropt.heartbeat_num_, timeropt.timeslice_);
         }
     }
 
@@ -134,7 +141,11 @@ namespace adachi::tool {
         }
     }
 
-    bool EventLoop::IsInThread() {
+    bool EventLoop::IsInThread() const {
         return tid_ == std::this_thread::get_id();
+    }
+
+    bool EventLoop::IsHeartBeat() const {
+        return timerptr_ != nullptr;
     }
 }

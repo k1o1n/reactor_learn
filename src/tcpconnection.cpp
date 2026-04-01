@@ -77,6 +77,7 @@ namespace adachi::network {
             }
         }
         else if (n == 0) {
+            // 这个地方后续可考虑修改为先处理完写缓冲区内容
             Close();
         } else {
             if (saveerrno == EAGAIN || saveerrno == EWOULDBLOCK || saveerrno == EINTR) {

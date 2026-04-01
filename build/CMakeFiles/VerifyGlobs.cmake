@@ -17,6 +17,8 @@ set(OLD_GLOB
   "/home/rikka/study/reactor/src/socket.cpp"
   "/home/rikka/study/reactor/src/tcpconnection.cpp"
   "/home/rikka/study/reactor/src/tcpserver.cpp"
+  "/home/rikka/study/reactor/src/timer/heartbeatobj.cpp"
+  "/home/rikka/study/reactor/src/timer/timer.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

@@ -9,12 +9,13 @@
 
 namespace adachi::network {
     TcpServer::TcpServer(const INetAddress& listenaddr
+        , const adachi::io::TimerOpt& timeropt
         , std::function<void(adachi::tool::EventLoopThread*)> prework
         , int maxevents)
 
         : listenaddr_(listenaddr)
-        , pool_(std::make_shared<adachi::tool::EventLoopThreadPool>(prework, maxevents))
-        , acceptor_thread_(std::make_unique<adachi::tool::EventLoopThread>(prework, maxevents))
+        , pool_(std::make_shared<adachi::tool::EventLoopThreadPool>(timeropt, prework, maxevents))
+        , acceptor_thread_(std::make_unique<adachi::tool::EventLoopThread>(timeropt, prework, maxevents))
         , baseloop_(acceptor_thread_->Start())
         , acceptor_(std::make_unique<adachi::network::Acceptor>(baseloop_, listenaddr))
     {

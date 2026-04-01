@@ -1,5 +1,5 @@
 #!/bin/sh
 cd /home/rikka/study/reactor
 git add .
-git commit -m "fix: message for htonl"
+git commit -m "feat: heartbeat mechanism"
 git push reactor_learn

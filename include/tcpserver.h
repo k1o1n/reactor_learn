@@ -5,22 +5,30 @@
 #include <memory>
 #include "inetaddress.h"
 #include <unordered_set>
+#include "timer/timer.h"
 
 namespace adachi::tool {
     class EventLoopThread;
     class EventLoop;
     class EventLoopThreadPool;
 }
+
 namespace adachi::network {
     class Acceptor;
     class TcpConnection;
 }
 
+namespace adachi::io {
+    class TimerOpt;
+}
+
 namespace adachi::network {
     /// WARNING: TcpServer 的生命周期必须长于所有 TcpConnection，否则其内部回调会引发 Use-After-Free 悬垂指针崩溃！
+    /// 其中timeropt参数为心跳机制，{时间轮片数，{每tick秒，每tick纳秒}}，将时间轮片数设定为0表示关闭心跳机制
     class TcpServer : adachi::tool::NonCopyAble, public std::enable_shared_from_this<TcpServer> {
     public:
         TcpServer(const INetAddress& listenaddr
+        , const adachi::io::TimerOpt& timeropt = {0, {0, 0}}
         , std::function<void(adachi::tool::EventLoopThread*)> prework = [](adachi::tool::EventLoopThread*){}
         , int maxevents = 1024);
         void SetSubThreadNum(unsigned int num);

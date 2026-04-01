@@ -24,6 +24,7 @@ namespace adachi::network {
     class TcpConnection : adachi::tool::NonCopyAble, public std::enable_shared_from_this<TcpConnection> {
     public:
         TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size = 1024, unsigned int write_buffer_size = 1024);
+        /// 这个地方后续可考虑修改为先处理完写缓冲区内容
         void Read();
         /// 发送信息，未发送成功的信息存在缓冲区，并设置epoll开始关注可写事件
         void Write(std::string message);

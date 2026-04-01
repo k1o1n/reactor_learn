@@ -3,21 +3,27 @@
 #include <functional>
 #include "noncopyable.h"
 #include "epoll.h"
-#include "memory"
+#include <memory>
 #include <atomic>
 #include <mutex>
 #include <vector>
 #include <thread>
+#include "timer/timer.h"
+
 namespace adachi::io {
     class Channel;
 }
+
 namespace adachi::io {
     class Channel;
+    class TimerOpt;
 }
+
 namespace adachi::tool {
+    /// 其中timeropt参数为心跳机制，{时间轮片数，{每tick秒，每tick纳秒}}，将时间轮片数设定为0表示关闭心跳机制
     class EventLoop : adachi::tool::NonCopyAble {
     public:
-        EventLoop(int maxevents = 1024);
+        EventLoop(const adachi::io::TimerOpt& timeropt = {0, {0, 0}}, int maxevents = 1024);
         ~EventLoop();
 
         void StopLoop();
@@ -35,7 +41,10 @@ namespace adachi::tool {
 
         void Submit(const std::function<void()>& cb);
 
-        bool IsInThread();
+        bool IsInThread() const;
+
+        /// 是否开启心跳机制
+        bool IsHeartBeat() const;
     private:
         adachi::io::Epoll epoll_;
         std::atomic<bool> quit_;    
@@ -44,6 +53,7 @@ namespace adachi::tool {
         adachi::io::Channel wakeupchannel_;
         std::vector<std::function<void()>> missions_;
         std::thread::id tid_;
+        std::unique_ptr<adachi::io::Timer> timerptr_;
     };
 }
 #endif // EVENTLOOP_H

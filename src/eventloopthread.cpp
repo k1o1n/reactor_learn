@@ -1,10 +1,14 @@
 #include "eventloopthread.h"
 #include "eventloop.h"
+
 namespace adachi::tool {
-    EventLoopThread::EventLoopThread(std::function<void(EventLoopThread*)> prework, int maxevents) 
+    EventLoopThread::EventLoopThread(const adachi::io::TimerOpt& timeropt
+        , std::function<void(EventLoopThread*)> prework
+        , int maxevents) 
+        
         : prework_(prework)
-        , start_([this, maxevents](){
-            EventLoop loop(maxevents);
+        , start_([this, maxevents, timeropt]() {
+            EventLoop loop(timeropt, maxevents);
             prework_(this);
 
             {
