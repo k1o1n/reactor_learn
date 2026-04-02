@@ -10,7 +10,7 @@ int main() {
     adachi::network::INetAddress listenaddr;
     listenaddr.SetIp("127.0.0.1");
     listenaddr.SetPort(12345);
-    adachi::network::TcpServer server(listenaddr, {0, {1, 0}});
+    adachi::network::TcpServer server(listenaddr, {10, {1, 0}});
     server.SetSubThreadNum(10);
     server.Start();
     std::cin.get();

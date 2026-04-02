@@ -2,6 +2,8 @@
 #include <functional>
 #include "eventloop.h"
 #include <iostream>
+#include "logger.h"
+
 namespace adachi::io {
     Channel::Channel(adachi::tool::EventLoop* loop, int fd) 
         : read_callback_([](){})
@@ -14,11 +16,11 @@ namespace adachi::io {
         , owner_(nullptr)
     {
         if (!loop) {
-            // std::cout << "[info] Channel constrution failed: found nullptr" << std::endl;
+            ADACHI_LOG_WARNING << "Channel constrution failed: found nullptr\n";
             return;
         }
         if (!loop->AddChannel(this)) {
-            // std::cout << "[info] Channel constrution failed" << std::endl;
+            ADACHI_LOG_WARNING << "Channel constrution failed\n";
             return;
         }
         owner_ = loop;
@@ -51,11 +53,11 @@ namespace adachi::io {
     Channel* Channel::SetActive(const int& status) {
         events_ = status;
         if (!owner_) {
-            // std::cout << "[info] SetActive failed: events set successfully but owner eventloop not found" << std::endl;
+            ADACHI_LOG_WARNING << "SetActive failed: events set successfully but owner eventloop not found\n";
             return this;
         }
         if (!owner_->UpdateChannel(this)) {
-            // std::cout << "[info] SetActive failed" << std::endl;
+            ADACHI_LOG_WARNING << "SetActive failed\n";
         }
         return this;
     }

@@ -11,6 +11,7 @@
 #include <cerrno>
 #include <cstring>
 #include "timer/timer.h"
+#include "logger.h"
 
 namespace adachi::tool {
     /// 非阻塞+LT模式
@@ -37,10 +38,9 @@ namespace adachi::tool {
                             // 被信号中断，忽略即可
                                 return;
                             }
-                            // std::cout << "[Error] wakeup failed: " << strerror(errno) << std::endl;
+                            ADACHI_LOG_ERROR << "wakeup failed: " << strerror(errno) << "\n";
                         }
-                        // 真正的错误
-                        // std::cout << "[Error] wakeup failed: reads " << n << " bytes instead of 8" << std::endl;
+                        ADACHI_LOG_ERROR << "wakeup failed: reads " << n << " bytes instead of 8" << "\n";
                     }
                 }
             });

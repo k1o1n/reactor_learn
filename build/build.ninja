@@ -121,6 +121,15 @@ build CMakeFiles/adachi.dir/src/inetaddress.cpp.o: CXX_COMPILER__adachi_Debug /h
   TARGET_COMPILE_PDB = CMakeFiles/adachi.dir/adachi.pdb
   TARGET_PDB = libadachi.pdb
 
+build CMakeFiles/adachi.dir/src/logger.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/logger.cpp || cmake_object_order_depends_target_adachi
+  DEP_FILE = CMakeFiles/adachi.dir/src/logger.cpp.o.d
+  FLAGS = -g -Wall -Wextra -Werror -g -O3 -fno-omit-frame-pointer -std=c++17
+  INCLUDES = -I/home/rikka/study/reactor/include
+  OBJECT_DIR = CMakeFiles/adachi.dir
+  OBJECT_FILE_DIR = CMakeFiles/adachi.dir/src
+  TARGET_COMPILE_PDB = CMakeFiles/adachi.dir/adachi.pdb
+  TARGET_PDB = libadachi.pdb
+
 build CMakeFiles/adachi.dir/src/noncopyable.cpp.o: CXX_COMPILER__adachi_Debug /home/rikka/study/reactor/src/noncopyable.cpp || cmake_object_order_depends_target_adachi
   DEP_FILE = CMakeFiles/adachi.dir/src/noncopyable.cpp.o.d
   FLAGS = -g -Wall -Wextra -Werror -g -O3 -fno-omit-frame-pointer -std=c++17
@@ -183,7 +192,7 @@ build CMakeFiles/adachi.dir/src/timer/timer.cpp.o: CXX_COMPILER__adachi_Debug /h
 #############################################
 # Link the static library libadachi.a
 
-build libadachi.a: CXX_STATIC_LIBRARY_LINKER__adachi_Debug CMakeFiles/adachi.dir/src/acceptor.cpp.o CMakeFiles/adachi.dir/src/buffer.cpp.o CMakeFiles/adachi.dir/src/channel.cpp.o CMakeFiles/adachi.dir/src/epoll.cpp.o CMakeFiles/adachi.dir/src/eventloop.cpp.o CMakeFiles/adachi.dir/src/eventloopthread.cpp.o CMakeFiles/adachi.dir/src/eventloopthreadpool.cpp.o CMakeFiles/adachi.dir/src/inetaddress.cpp.o CMakeFiles/adachi.dir/src/noncopyable.cpp.o CMakeFiles/adachi.dir/src/socket.cpp.o CMakeFiles/adachi.dir/src/tcpconnection.cpp.o CMakeFiles/adachi.dir/src/tcpserver.cpp.o CMakeFiles/adachi.dir/src/timer/heartbeatobj.cpp.o CMakeFiles/adachi.dir/src/timer/timer.cpp.o
+build libadachi.a: CXX_STATIC_LIBRARY_LINKER__adachi_Debug CMakeFiles/adachi.dir/src/acceptor.cpp.o CMakeFiles/adachi.dir/src/buffer.cpp.o CMakeFiles/adachi.dir/src/channel.cpp.o CMakeFiles/adachi.dir/src/epoll.cpp.o CMakeFiles/adachi.dir/src/eventloop.cpp.o CMakeFiles/adachi.dir/src/eventloopthread.cpp.o CMakeFiles/adachi.dir/src/eventloopthreadpool.cpp.o CMakeFiles/adachi.dir/src/inetaddress.cpp.o CMakeFiles/adachi.dir/src/logger.cpp.o CMakeFiles/adachi.dir/src/noncopyable.cpp.o CMakeFiles/adachi.dir/src/socket.cpp.o CMakeFiles/adachi.dir/src/tcpconnection.cpp.o CMakeFiles/adachi.dir/src/tcpserver.cpp.o CMakeFiles/adachi.dir/src/timer/heartbeatobj.cpp.o CMakeFiles/adachi.dir/src/timer/timer.cpp.o
   LANGUAGE_COMPILE_FLAGS = -g
   OBJECT_DIR = CMakeFiles/adachi.dir
   POST_BUILD = :

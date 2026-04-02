@@ -6,6 +6,8 @@
 #include "inetaddress.h"
 #include "eventloop.h"
 #include "acceptor.h"
+#include "logger.h"
+
 namespace adachi::network {
     Acceptor::Acceptor(adachi::tool::EventLoop* loop, const INetAddress &listenaddr) 
         : socket_(adachi::network::Socket::CreateNonBlockSocket())
@@ -13,7 +15,7 @@ namespace adachi::network {
         , owner_(loop)
     {
         if (!socket_.BindAddress(listenaddr)) {
-            // std::cout << "[error] class Acceptor: BindAddress error" << std::endl;
+            ADACHI_LOG_ERROR << "class Acceptor: BindAddress error\n";
             return;
         }
         accept_channel_.SetActive(adachi::io::Channel::kRead);

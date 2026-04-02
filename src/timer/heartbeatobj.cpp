@@ -1,5 +1,6 @@
 #include "timer/heartbeatobj.h"
 #include "tcpconnection.h"
+#include "logger.h"
 
 namespace adachi::tool {
     HeartBeatObj::HeartBeatObj(std::weak_ptr<adachi::network::TcpConnection> tcp_weakptr) 
@@ -8,6 +9,9 @@ namespace adachi::tool {
     {
     }
     HeartBeatObj::~HeartBeatObj() {
-        if (auto ptr = tcp_weakptr_.lock()) ptr->Close(); 
+        if (auto ptr = tcp_weakptr_.lock()) {
+            ADACHI_LOG_INFO << ptr->addr_.Ip() << " will be closed because of heartbeat mechanism\n";
+            ptr->Close();
+        } 
     }
 }

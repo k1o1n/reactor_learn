@@ -12,6 +12,8 @@ namespace adachi::network {
         INetAddress();
         INetAddress(const INetAddress&);
         INetAddress(INetAddress&&);
+        INetAddress& operator=(const INetAddress&);
+        INetAddress& operator=(INetAddress&&);
         bool SetIp(const std::string& ip);
         void SetPort(const in_port_t& port);
 

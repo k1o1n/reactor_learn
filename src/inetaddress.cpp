@@ -21,6 +21,20 @@ namespace adachi::network {
         len_ = sizeof(sockaddr_in);
         addr_.sin_family = AF_INET;
     }
+    INetAddress& INetAddress::operator=(const INetAddress& obj) {
+        SetIp(obj.Ip());
+        SetPort(obj.Port());
+        len_ = sizeof(sockaddr_in);
+        addr_.sin_family = AF_INET;
+        return *this;
+    }
+    INetAddress& INetAddress::operator=(INetAddress&& obj) {
+        SetIp(obj.Ip());
+        SetPort(obj.Port());
+        len_ = sizeof(sockaddr_in);
+        addr_.sin_family = AF_INET;
+        return *this;
+    }
     bool INetAddress::SetIp(const std::string& ip) {
         return inet_pton(addr_.sin_family, ip.c_str(), &addr_.sin_addr) == 1;
     }

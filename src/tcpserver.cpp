@@ -6,6 +6,7 @@
 #include <iostream>
 #include "inetaddress.h"
 #include "tcpconnection.h"
+#include "logger.h"
 
 namespace adachi::network {
     TcpServer::TcpServer(const INetAddress& listenaddr
@@ -33,16 +34,17 @@ namespace adachi::network {
             pool_->Start();
         }
         else {
-            // std::cout << "[Error] TcpServer Start failed: acceptor_thread_->Start() return nullptr" << std::endl;
+            ADACHI_LOG_ERROR << "TcpServer Start failed: acceptor_thread_->Start() return nullptr\n";
         }   
     }
 
     void TcpServer::SetNewconnectionCallback(std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> callback) {
         acceptor_->SetNewconnectionCallback([this, callback = std::move(callback), isheartbeat = isheartbeat_](int fd, adachi::network::INetAddress& addr, int saveerrno) {
             if (fd >= 0) {
-                // std::cout << "[info] receive a connection from " << addr.Ip() << " " << std::endl;
+                ADACHI_LOG_INFO << "receive a connection from " << addr.Ip() << "\n";
                 addr.Ip();
                 std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(pool_->GetOneThread(), fd);
+                linkptr->addr_ = addr;
                 if (isheartbeat) {
                     linkptr->SaveLifeMechanism();
                 }
@@ -60,7 +62,7 @@ namespace adachi::network {
             }
             else {
                 strerror(saveerrno);
-                // std::cout << "[Error] connection failed: " << strerror(saveerrno) << std::endl;
+                ADACHI_LOG_ERROR << "connection failed: " << strerror(saveerrno) << "\n";
             }
         });
     }   

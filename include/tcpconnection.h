@@ -12,6 +12,10 @@
 #include "timer/heartbeatobj.h"
 #include "timer/timer.h"
 
+namespace adachi::network {
+    class INetAddress;
+}
+
 namespace adachi::tool {
     class EventLoop;
 }
@@ -23,6 +27,7 @@ namespace adachi::network {
     /// TcpConnection类由于持有Channel，创建后需要检查是否绑定成功Eventloop（调用Channel成员的GetOwner()检查）
     /// 默认创建后就会被加入到一个EventLoop中
     /// 设置该类的可写回调时必须显示调用该类的WriteFd函数，这涉及到该类的正常关闭
+    /// 注意：addr_默认为空，即需要手动绑定，用于临时存储某个地址
     class TcpConnection : adachi::tool::NonCopyAble, public std::enable_shared_from_this<TcpConnection> {
     public:
         TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size = 1024, unsigned int write_buffer_size = 1024);
@@ -47,7 +52,8 @@ namespace adachi::network {
         bool IsWriteBufferEmpty();
 
         std::unique_ptr<adachi::io::Channel> channel_;
-
+        /// 注意：addr_默认为空，即需要手动绑定，用于临时存储某个地址
+        adachi::network::INetAddress addr_;
     private:
         void WriteInThread(std::string);
         void CloseInThread();
