@@ -63,6 +63,7 @@ namespace adachi::tool {
     // class Logger;
     /// Logger的后端处理器，初始化传入日志需要保存的路径
     /// 默认全局实例为终端路径下"pid" + std::to_string(getpid()) + ".log"的日志
+    /// 日志存在处理上限，如果后端处理速度过慢，会出现部分日志丢失的情况
     class AsyncLogging : NonCopyAble {
     public:
         AsyncLogging(const std::string& logpath);
@@ -72,8 +73,10 @@ namespace adachi::tool {
         void Append(const char* buf, unsigned int len);
         void BackendThreadFunc();    
 
+        /// 每一个buffer的大小
         static constexpr unsigned int kBackendbuffersize = Logger::kLoggerbuffersize * 1024;
-
+        /// buffer数量的上限，超过这个上限就会发生截断
+        static constexpr unsigned int kBackendbufferlimit = 25;
     private:
         std::atomic<bool> running_;
         std::mutex mtx_;

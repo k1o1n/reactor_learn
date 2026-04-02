@@ -114,25 +114,36 @@ namespace adachi::tool {
 
     void AsyncLogging::Append(const char* buf, unsigned int len) {
         bool check = false;
+        bool should_drop = false;
         {
             std::lock_guard<std::mutex> lock(mtx_);
+
             if (current_buffer_ == nullptr) std::swap(current_buffer_, next_buffer_);
 
             if (current_buffer_ == nullptr) current_buffer_ = new char[kBackendbuffersize];
 
             if (kBackendbuffersize - len_ < len) {
-                work_list_.emplace_back(current_buffer_, len_);
-                check = true;
-                current_buffer_ = nullptr;
-                len_ = 0;
-                std::swap(current_buffer_, next_buffer_);
-                if (current_buffer_ == nullptr) {
-                    current_buffer_ = new char[kBackendbuffersize];
+                if (work_list_.size() >= kBackendbufferlimit) {
+                    // 队列已满时只丢当前新日志，保留 current_buffer_ 中已经积累的旧日志。
+                    should_drop = true;
+                    check = true;
+                }
+                else {
+                    work_list_.emplace_back(current_buffer_, len_);
+                    check = true;
+                    current_buffer_ = nullptr;
+                    len_ = 0;
+                    std::swap(current_buffer_, next_buffer_);
+                    if (current_buffer_ == nullptr) {
+                        current_buffer_ = new char[kBackendbuffersize];
+                    }
                 }
             }
 
-            memcpy(current_buffer_ + len_, buf, len);
-            len_ += len;
+            if (!should_drop) {
+                memcpy(current_buffer_ + len_, buf, len);
+                len_ += len;
+            }
         }
 
         if (check) cv_.notify_one();
