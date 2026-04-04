@@ -40,6 +40,7 @@ namespace adachi::tool {
         void DoCrossThreadMission();
 
         void Submit(const std::function<void()>& cb);
+        void SubmitAndWait(const std::function<void()>& cb);
 
         bool IsInThread() const;
 

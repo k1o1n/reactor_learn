@@ -33,6 +33,7 @@ namespace adachi::network {
         TcpConnection(adachi::tool::EventLoop* loop, int fd, unsigned int read_buffer_size = 1024, unsigned int write_buffer_size = 1024);
         /// 这个地方后续可考虑修改为先处理完写缓冲区内容
         void Read();
+        void Activate();
         /// 发送信息，未发送成功的信息存在缓冲区，并设置epoll开始关注可写事件
         void Write(std::string message);
         /// 尝试发送可写缓冲区信息到对应描述符
@@ -55,6 +56,7 @@ namespace adachi::network {
         /// 注意：addr_默认为空，即需要手动绑定，用于临时存储某个地址
         adachi::network::INetAddress addr_;
     private:
+        void ActivateInThread();
         void WriteInThread(std::string);
         void CloseInThread();
 

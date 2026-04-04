@@ -63,8 +63,25 @@ namespace adachi::network {
         channel_->SetCloseCallback([ptr = this]() {
             ptr->Close();
         });
+    }
 
-        channel_->SetActive(adachi::io::Channel::kRead | adachi::io::Channel::kClose);
+    void TcpConnection::Activate() {
+        if (channel_ == nullptr || channel_->owner_ == nullptr) {
+            ADACHI_LOG_ERROR << "TcpConnection::Activate failed: channel owner is nullptr\n";
+            return;
+        }
+
+        if (channel_->owner_->IsInThread()) {
+            ActivateInThread();
+        }
+        else {
+            auto weak_self = weak_from_this();
+            channel_->owner_->Submit([weak_self]() {
+                if (auto self = weak_self.lock()) {
+                    self->ActivateInThread();
+                }
+            });
+        }
     }
     /// 正常读操作完毕会默认调用onmessage进行解析
     void TcpConnection::Read() {
@@ -202,6 +219,13 @@ namespace adachi::network {
 
     bool TcpConnection::IsWriteBufferEmpty() {
         return write_buffer_.Empty();
+    }
+
+    void TcpConnection::ActivateInThread() {
+        if (status_ != kConnecting) {
+            return;
+        }
+        channel_->SetActive(adachi::io::Channel::kRead | adachi::io::Channel::kClose);
     }
 
     void TcpConnection::WriteInThread(std::string message) {

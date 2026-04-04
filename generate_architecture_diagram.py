@@ -8,8 +8,8 @@ from dataclasses import dataclass
 from html import escape
 
 
-CANVAS_WIDTH = 1680
-CANVAS_HEIGHT = 980
+CANVAS_WIDTH = 1760
+CANVAS_HEIGHT = 1040
 
 
 @dataclass(frozen=True)
@@ -102,43 +102,43 @@ def render_arrow_label(arrow: Arrow) -> str:
 
 def build_diagram() -> str:
     groups = [
-        Group(60, 120, 430, 760, "Main Reactor Plane", "acceptor thread + base EventLoop", "#f8fbff", "#85a8c6"),
-        Group(540, 120, 760, 760, "Sub Reactors Plane", "one loop per thread for connection I/O", "#fbfcf7", "#92b07f"),
-        Group(1330, 120, 290, 760, "Shared Services", "cross-cutting runtime components", "#fffaf4", "#d8ac67"),
+        Group(60, 130, 460, 800, "Main Reactor Plane", "acceptor thread + base EventLoop", "#f8fbff", "#85a8c6"),
+        Group(560, 130, 820, 800, "Sub Reactors Plane", "owner-loop initialization and connection I/O", "#fbfcf7", "#92b07f"),
+        Group(1410, 130, 290, 800, "Shared Services", "cross-cutting runtime components", "#fffaf4", "#d8ac67"),
     ]
 
     boxes = [
-        Box("client", 90, 190, 170, 86, "Clients", "requests / keepalive traffic", "#dff3ff", "#5fa8d3"),
-        Box("acceptor", 285, 190, 175, 86, "Acceptor", "listen + accept new fds", "#ffe8c9", "#d39a4f"),
-        Box("main_reactor", 155, 350, 270, 116, "MainReactor", "base EventLoop with epoll + eventfd", "#d8ecff", "#4e8ec6"),
-        Box("tcp_server", 155, 535, 270, 116, "TcpServer", "owns acceptor thread and thread pool", "#e7f0ff", "#6c90c8"),
-        Box("thread_pool", 610, 190, 300, 86, "EventLoopThreadPool", "round-robin dispatch to workers", "#e6f7df", "#77a95d"),
-        Box("sub_reactors", 980, 190, 240, 86, "SubReactors", "multiple EventLoop threads", "#e3f2d9", "#7eab63"),
-        Box("event_loop", 630, 370, 280, 116, "EventLoop", "epoll, wakeup, task queue", "#d8f0d0", "#6d9960"),
-        Box("channel", 970, 370, 220, 116, "Channel", "fd event wrapper + callbacks", "#eef7dd", "#91ad5a"),
-        Box("tcp_connection", 630, 570, 300, 116, "TcpConnection", "read/write buffer, close flow, OnMessage", "#dff3d7", "#6fa05e"),
-        Box("timer_wheel", 970, 570, 220, 116, "TimerWheel", "timerfd-driven heartbeat buckets", "#f1f8d8", "#9eb34e"),
-        Box("app_logic", 720, 742, 400, 108, "User Callback /\nProtocol Layer", "length-prefixed parsing\nand business logic", "#edf0ff", "#7e86cc", title_size=20, subtitle_size=13),
-        Box("logger", 1370, 240, 220, 92, "Logger", "front-end logging macros", "#fff1db", "#d39a4f"),
-        Box("async_logging", 1370, 430, 220, 112, "AsyncLogging", "double buffer + flush thread", "#ffe6c4", "#cc8b3f"),
-        Box("log_file", 1370, 630, 220, 86, "Log File", "pid*.log / benchmark output", "#fff7e8", "#d4ab67"),
+        Box("client", 90, 210, 180, 88, "Clients", "requests / keepalive traffic", "#dff3ff", "#5fa8d3"),
+        Box("acceptor", 300, 210, 190, 88, "Acceptor", "accept loop drains backlog", "#ffe8c9", "#d39a4f"),
+        Box("main_reactor", 160, 385, 300, 120, "MainReactor", "base EventLoop with epoll + eventfd", "#d8ecff", "#4e8ec6"),
+        Box("tcp_server", 160, 585, 300, 124, "TcpServer", "baseloop registry + dispatch policy", "#e7f0ff", "#6c90c8"),
+        Box("thread_pool", 610, 210, 320, 88, "EventLoopThreadPool", "round-robin dispatch to workers", "#e6f7df", "#77a95d"),
+        Box("sub_reactors", 1020, 210, 260, 88, "SubReactors", "multiple EventLoop threads", "#e3f2d9", "#7eab63"),
+        Box("event_loop", 640, 390, 310, 124, "EventLoop", "epoll, wakeup, owner-thread tasks", "#d8f0d0", "#6d9960"),
+        Box("channel", 1030, 390, 230, 124, "Channel", "fd event wrapper + callbacks", "#eef7dd", "#91ad5a"),
+        Box("tcp_connection", 640, 605, 330, 124, "TcpConnection", "owner-loop init, read/write, close flow", "#dff3d7", "#6fa05e"),
+        Box("timer_wheel", 1030, 605, 230, 124, "TimerWheel", "timerfd + heartbeat buckets", "#f1f8d8", "#9eb34e"),
+        Box("app_logic", 720, 800, 460, 96, "User Callback /\nProtocol Layer", "length-prefixed parsing and business logic", "#edf0ff", "#7e86cc", title_size=20, subtitle_size=13),
+        Box("logger", 1440, 250, 220, 96, "Logger", "front-end logging macros", "#fff1db", "#d39a4f"),
+        Box("async_logging", 1440, 455, 220, 122, "AsyncLogging", "buffer queue + dedicated flush thread", "#ffe6c4", "#cc8b3f"),
+        Box("log_file", 1440, 675, 220, 88, "Log File", "pid*.log / benchmark output", "#fff7e8", "#d4ab67"),
     ]
 
     arrows = [
-        Arrow(((260, 233), (285, 233)), "connect", 272, 220),
-        Arrow(((372, 276), (372, 320), (290, 320), (290, 350)), "accept", 340, 309),
-        Arrow(((290, 466), (290, 535)), "own base loop", 348, 505),
-        Arrow(((425, 593), (505, 593), (505, 233), (610, 233)), "round-robin", 533, 580),
-        Arrow(((910, 233), (980, 233)), "worker loops", 944, 220),
-        Arrow(((1100, 276), (1100, 332), (770, 332), (770, 370)), "one loop per thread", 1000, 324),
-        Arrow(((910, 428), (970, 428)), "epoll events", 940, 415),
-        Arrow(((1080, 486), (1080, 528), (780, 528), (780, 570)), "callbacks", 985, 520),
-        Arrow(((930, 628), (970, 628)), "heartbeat refresh", 952, 616),
-        Arrow(((1080, 570), (1080, 540), (840, 540), (840, 570)), "idle timeout", 952, 533, dashed=True),
-        Arrow(((780, 686), (780, 728), (920, 728), (920, 742)), "protocol dispatch", 860, 720),
-        Arrow(((770, 370), (770, 315), (1285, 315), (1285, 286), (1370, 286)), "runtime logs", 1280, 304),
-        Arrow(((1480, 332), (1480, 430)), "append", 1518, 388),
-        Arrow(((1480, 542), (1480, 630)), "flush", 1516, 592),
+        Arrow(((270, 254), (300, 254)), "connect", 284, 240),
+        Arrow(((395, 298), (395, 346), (310, 346), (310, 385)), "drain accept", 370, 334),
+        Arrow(((310, 505), (310, 585)), "base loop", 366, 552),
+        Arrow(((460, 646), (535, 646), (535, 254), (610, 254)), "choose io loop", 546, 630),
+        Arrow(((930, 254), (1020, 254)), "worker loops", 975, 240),
+        Arrow(((1150, 298), (1150, 352), (795, 352), (795, 390)), "owner-loop init", 1052, 344),
+        Arrow(((950, 452), (1030, 452)), "epoll events", 990, 438),
+        Arrow(((1145, 514), (1145, 566), (810, 566), (810, 605)), "callbacks", 980, 548),
+        Arrow(((970, 665), (1030, 665)), "heartbeat refresh", 1000, 646),
+        Arrow(((1145, 605), (1145, 570), (875, 570), (875, 605)), "idle timeout", 1080, 556, dashed=True),
+        Arrow(((820, 729), (820, 776), (950, 776), (950, 800)), "protocol dispatch", 888, 768),
+        Arrow(((795, 390), (795, 330), (1375, 330), (1375, 298), (1440, 298)), "runtime logs", 1355, 318),
+        Arrow(((1550, 346), (1550, 455)), "append", 1588, 408),
+        Arrow(((1550, 577), (1550, 675)), "flush", 1582, 632),
     ]
 
     parts = [
@@ -157,8 +157,8 @@ def build_diagram() -> str:
         "    </marker>",
         "  </defs>",
         "  <rect width=\"100%\" height=\"100%\" fill=\"url(#bg)\" />",
-        "  <text x=\"60\" y=\"64\" font-size=\"34\" font-weight=\"800\" fill=\"#10202d\">reactor Architecture</text>",
-        "  <text x=\"60\" y=\"95\" font-size=\"16\" fill=\"#4b6271\">C++17, epoll, eventfd, one loop per thread, timer wheel heartbeat, async logging</text>",
+        "  <text x=\"60\" y=\"66\" font-size=\"34\" font-weight=\"800\" fill=\"#10202d\">reactor Architecture</text>",
+        "  <text x=\"60\" y=\"98\" font-size=\"16\" fill=\"#4b6271\">C++17, epoll, eventfd, one loop per thread, timer wheel heartbeat, async logging</text>",
     ]
 
     parts.extend(render_group(group) for group in groups)
@@ -171,8 +171,8 @@ def build_diagram() -> str:
     parts.append("  <g>")
     parts.extend(render_arrow_label(arrow) for arrow in arrows)
     parts.extend([
-        "    <rect x=\"60\" y=\"902\" width=\"1560\" height=\"42\" rx=\"14\" fill=\"#ffffff\" opacity=\"0.92\" stroke=\"#d7e2e9\" />",
-        "    <text x=\"84\" y=\"929\" font-size=\"13\" fill=\"#304958\">MainReactor accepts new connections and TcpServer dispatches sockets to SubReactors. Each worker EventLoop manages Channel and TcpConnection I/O. TimerWheel handles heartbeat expiry. Logger writes through AsyncLogging to disk.</text>",
+        "    <text x=\"60\" y=\"972\" font-size=\"13\" fill=\"#304958\">MainReactor drains the accept backlog, TcpServer dispatches sockets to SubReactors, and each owner EventLoop initializes TcpConnection, heartbeat state, and protocol callbacks before I/O is activated.</text>",
+        "    <text x=\"60\" y=\"994\" font-size=\"13\" fill=\"#304958\">Logger appends through AsyncLogging, which keeps buffer ownership separate from backend wakeups and flushes batched output to disk.</text>",
         "  </g>",
         "</svg>",
     ])

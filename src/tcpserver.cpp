@@ -4,6 +4,7 @@
 #include "eventloopthreadpool.h"
 #include "acceptor.h"
 #include <iostream>
+#include <unistd.h>
 #include "inetaddress.h"
 #include "tcpconnection.h"
 #include "logger.h"
@@ -29,9 +30,8 @@ namespace adachi::network {
     }
     void TcpServer::Start() {
         if (baseloop_) {
-            acceptor_->Listen();
-            // 设置回调函数
             pool_->Start();
+            acceptor_->Listen();
         }
         else {
             ADACHI_LOG_ERROR << "TcpServer Start failed: acceptor_thread_->Start() return nullptr\n";
@@ -42,23 +42,35 @@ namespace adachi::network {
         acceptor_->SetNewconnectionCallback([this, callback = std::move(callback), isheartbeat = isheartbeat_](int fd, adachi::network::INetAddress& addr, int saveerrno) {
             if (fd >= 0) {
                 ADACHI_LOG_INFO << "receive a connection from " << addr.Ip() << "\n";
-                addr.Ip();
-                std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(pool_->GetOneThread(), fd);
-                linkptr->addr_ = addr;
-                if (isheartbeat) {
-                    linkptr->SaveLifeMechanism();
+                adachi::tool::EventLoop* io_loop = pool_->GetOneThread();
+                if (io_loop == nullptr) {
+                    close(fd);
+                    ADACHI_LOG_ERROR << "connection failed: EventLoopThreadPool returned nullptr\n";
+                    return;
                 }
 
-                tcpst_.insert(linkptr);
-                linkptr->SetCloseCallback([this, closecallback = closecallback_](std::shared_ptr<TcpConnection> linkptr) {
-                    //std::lock_guard<std::mutex> lock(server.mtx_);
-                    closecallback(linkptr);
-                    baseloop_->Submit([this, linkptr]() {
-                        tcpst_.erase(linkptr);
-                    }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
-                });
+                adachi::network::INetAddress peer_addr = addr;
+                io_loop->Submit([this, callback, isheartbeat, fd, peer_addr = std::move(peer_addr), io_loop]() mutable {
+                    std::shared_ptr<adachi::network::TcpConnection> linkptr = std::make_shared<adachi::network::TcpConnection>(io_loop, fd);
+                    linkptr->addr_ = peer_addr;
+                    if (isheartbeat) {
+                        linkptr->SaveLifeMechanism();
+                    }
 
-                callback(linkptr);
+                    baseloop_->SubmitAndWait([this, linkptr]() {
+                        tcpst_.insert(linkptr);
+                    });
+
+                    linkptr->SetCloseCallback([this, closecallback = closecallback_](std::shared_ptr<TcpConnection> linkptr) {
+                        closecallback(linkptr);
+                        baseloop_->Submit([this, linkptr]() {
+                            tcpst_.erase(linkptr);
+                        }); /// 多线程操纵红黑树有危险，需要交由一个线程统一管理
+                    });
+
+                    callback(linkptr);
+                    linkptr->Activate();
+                });
             }
             else {
                 strerror(saveerrno);

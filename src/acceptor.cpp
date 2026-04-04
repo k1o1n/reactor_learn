@@ -18,12 +18,12 @@ namespace adachi::network {
             ADACHI_LOG_ERROR << "class Acceptor: BindAddress error\n";
             return;
         }
-        accept_channel_.SetActive(adachi::io::Channel::kRead);
     }
 
     bool Acceptor::Listen(const int& backlog) {
         if (socket_.Listen(backlog)) {
             listen_check_ = true;
+            accept_channel_.SetActive(adachi::io::Channel::kRead);
             return true;
         }
         return false;
@@ -35,11 +35,25 @@ namespace adachi::network {
 
     void Acceptor::SetNewconnectionCallback(std::function<void(int, INetAddress&, int)> callback) {
         accept_channel_.SetReadCallback([this, callback](){
-            INetAddress newlink_addr;
-            int fd = Accept(newlink_addr);
-            int saveerrno = 0;
-            if (fd < 0) saveerrno = errno;
-            callback(fd, newlink_addr, saveerrno);
+            while (true) {
+                INetAddress newlink_addr;
+                int fd = Accept(newlink_addr);
+                if (fd >= 0) {
+                    callback(fd, newlink_addr, 0);
+                    continue;
+                }
+
+                int saveerrno = errno;
+                if (saveerrno == EAGAIN || saveerrno == EWOULDBLOCK) {
+                    break;
+                }
+                if (saveerrno == EINTR) {
+                    continue;
+                }
+
+                callback(fd, newlink_addr, saveerrno);
+                break;
+            }
         });
     }
 }

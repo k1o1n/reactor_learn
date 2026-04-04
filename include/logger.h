@@ -4,6 +4,7 @@
 #include <string>
 #include <mutex>
 #include <condition_variable>
+#include <memory>
 #include "noncopyable.h"
 #include <vector>
 #include <cstring>
@@ -78,15 +79,28 @@ namespace adachi::tool {
         /// buffer数量的上限，超过这个上限就会发生截断
         static constexpr unsigned int kBackendbufferlimit = 25;
     private:
+        struct PendingBuffer {
+            std::unique_ptr<char[]> data;
+            unsigned int len = 0;
+        };
+
+        void StartBackendThread();
+        std::unique_ptr<char[]> TakeBufferLocked();
+        void RecycleBufferLocked(std::unique_ptr<char[]> buffer);
+
         std::atomic<bool> running_;
-        std::mutex mtx_;
-        std::condition_variable cv_;
+        std::recursive_mutex mtx_;
 
-        char* current_buffer_;
-        char* next_buffer_;
-        int len_;
+        std::mutex wake_mtx_;
+        std::condition_variable wake_cv_;
+        std::atomic<bool> wake_requested_{false};
 
-        std::vector<std::pair<char*, unsigned int>> work_list_;
+        std::unique_ptr<char[]> current_buffer_;
+        unsigned int current_buffer_len_;
+        std::unique_ptr<char[]> next_buffer_;
+
+        std::vector<PendingBuffer> work_list_;
+        std::vector<std::unique_ptr<char[]>> empty_buffers_;
         
         std::string logpath_;
 

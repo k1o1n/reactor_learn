@@ -141,6 +141,34 @@ namespace adachi::tool {
         }
     }
 
+    void EventLoop::SubmitAndWait(const std::function<void()>& cb) {
+        if (tid_ == std::this_thread::get_id()) {
+            cb();
+            return;
+        }
+
+        struct WaitState {
+            std::mutex mtx;
+            std::condition_variable cv;
+            bool done = false;
+        };
+
+        auto state = std::make_shared<WaitState>();
+        std::function<void()> task = cb;
+
+        Submit([task = std::move(task), state]() {
+            task();
+            {
+                std::lock_guard<std::mutex> lock(state->mtx);
+                state->done = true;
+            }
+            state->cv.notify_one();
+        });
+
+        std::unique_lock<std::mutex> lock(state->mtx);
+        state->cv.wait(lock, [state]() { return state->done; });
+    }
+
     bool EventLoop::IsInThread() const {
         return tid_ == std::this_thread::get_id();
     }

@@ -23,7 +23,8 @@
 
 - MainReactor 负责监听端口、接收新连接
 - TcpServer 持有一个 acceptor 线程和一个 EventLoopThreadPool
-- 新连接建立后，由线程池按轮询策略分配到某个 SubReactor 所属的 EventLoop
+- Acceptor 在每次监听套接字可读时会持续 accept，直到 backlog 被排空
+- 新连接建立后，由线程池按轮询策略分配到某个 SubReactor 所属的 EventLoop，并在该 owner loop 上完成连接初始化
 - 每个 EventLoop 独立持有 epoll 实例，负责本线程内的 I/O 事件分发
 - Channel 对文件描述符及其读写/错误/关闭回调进行封装
 - TcpConnection 封装连接读写、发送缓冲、关闭流程与业务回调入口
@@ -34,11 +35,11 @@
 更贴近代码实现的调用链可以概括为：
 
 1. TcpServer 在独立 acceptor 线程中启动 baseloop，并挂载 Acceptor。
-2. Acceptor 监听新连接，接收成功后创建 TcpConnection。
-3. TcpConnection 被分配到某个 SubReactor 的 EventLoop，并绑定对应 Channel。
+2. Acceptor 监听新连接，并在每次 EPOLLIN 中尽量排空监听 backlog。
+3. 新连接先被分配到某个 SubReactor 的 EventLoop，再在该 owner loop 中构造 TcpConnection、注册心跳并激活读事件。
 4. 连接上的可读/可写事件由该 EventLoop 所属线程处理，避免多线程直接竞争同一连接状态。
 5. 若启用心跳机制，读事件会刷新 HeartBeatObj 到时间轮中，空闲连接由时间轮自然淘汰。
-6. 日志通过 Logger 宏写入 AsyncLogging 后端，由后台线程集中刷盘。
+6. 日志通过 Logger 宏写入 AsyncLogging 后端，由后台线程集中刷盘；前台数据锁与后台唤醒路径分离，避免同线程重入与后台等待路径互相干扰。
 
 架构图由根目录脚本 [generate_architecture_diagram.py](generate_architecture_diagram.py) 生成，默认输出到 [docs/architecture.svg](docs/architecture.svg)。
 
@@ -67,6 +68,7 @@
 - 基于 timerfd 驱动 Tick
 - 使用时间轮维护连接活跃性
 - 结合 HeartBeatObj 生命周期管理实现空闲连接超时回收
+- 新连接的首次心跳注册已经迁移到 owner loop 上完成，避免高并发下跨线程异步注册被延迟
 - 项目中已提供混合心跳压力脚本，用于验证活跃连接保活与静默连接超时行为
 
 ### 5. 异步日志系统
@@ -75,6 +77,7 @@
 - 前台线程只负责追加日志到缓冲区，后台线程集中刷盘
 - 使用双缓冲思路降低前台线程写日志时的阻塞
 - 在缓冲队列达到上限时支持丢弃新日志，避免无限制堆积
+- 数据缓冲互斥与后台线程唤醒路径已经拆分，ThreadSanitizer 下的独立日志压测可通过
 
 ### 6. 工程与测试辅助
 
@@ -122,6 +125,22 @@
 
 这些脚本当前更偏向功能稳定性验证，README 暂不虚构未落地的吞吐数据。
 
+## 并发校验
+
+最近一轮基于 ThreadSanitizer 的并发校验，已经覆盖日志库与心跳链路的关键路径。
+
+已确认通过的验证包括：
+
+- 独立日志压测：单线程与多线程模式下，基于 `test/logger_stress.cpp + src/logger.cpp` 的 TSAN 压测可完成并输出 `PASS`
+- TSAN 服务端 + 混合心跳压测：`build/test` 在 `ENABLE_TSAN=ON` 下可通过 `test/start_heartbeat_mixed_stress_test.sh`
+- 混合心跳压测目标指标：`active_replied=2000/2000`、`active_closed_during_phase=0`、`active_closed_after_stop_in_range=2000/2000`、`silent_closed_in_range=8000/8000`
+
+这一轮修正主要集中在三件事：
+
+- 新连接初始化迁移到目标 owner loop，避免“先 accept、后跨线程补初始化”导致的时间窗口问题
+- Acceptor 在单次可读事件中排空监听 backlog，避免大批连接延迟进入心跳计时窗口
+- AsyncLogging 将数据互斥与后台唤醒拆分，避免前台追加与后台等待在 TSAN 下形成虚假或真实的重入锁竞争
+
 ## 构建方式
 
 ### 仓库包含范围说明
@@ -154,6 +173,13 @@ cmake --preset default
 cmake --build build
 ```
 
+如需启用 ThreadSanitizer：
+
+```bash
+cmake --preset tsan
+cmake --build build
+```
+
 基础构建会生成：
 
 - 静态库 `adachi`
@@ -177,6 +203,13 @@ cmake --build build
 
 该脚本会在本地临时编译 `test/logger_stress.cpp`，并在运行后生成日志文件；这些二进制与日志文件不属于源码仓库的固定内容。
 
+如需直接验证日志库的 TSAN 行为，可参考下面这种本地命令：
+
+```bash
+g++ -O1 -g -std=c++17 -Wall -Wextra -Werror -fsanitize=thread -fno-omit-frame-pointer -pthread -I./include test/logger_stress.cpp src/logger.cpp -o test/logger_stress_tsan
+TSAN_OPTIONS=halt_on_error=1:second_deadlock_stack=1 ./test/logger_stress_tsan 8 5 128
+```
+
 ### 运行基础连接压测
 
 ```bash
@@ -194,6 +227,14 @@ cmake --build build
 ```
 
 该脚本会在本地编译 `heartbeat_mixed_stress_client` 后执行，不依赖仓库预置二进制。
+
+如需在 TSAN 构建下复现实验，可先启动：
+
+```bash
+TSAN_OPTIONS=halt_on_error=1:second_deadlock_stack=1 ./build/test
+```
+
+然后在另一个终端执行混合压测脚本。
 
 ### 生成架构图
 
@@ -229,3 +270,4 @@ python3 ./generate_architecture_diagram.py --output docs/architecture.svg
 - [test](test)：示例程序、客户端源码与压测脚本；部分脚本会在本地临时编译测试二进制
 - [FlameGraph](FlameGraph)：性能分析辅助工具
 - [docs](docs)：README 引用的生成型文档资源；如图文件缺失可通过脚本重新生成
+- [prompt](prompt)：本地提示词与协作记录；通常不是项目运行必须文件，也不一定会随仓库分发

@@ -27,18 +27,42 @@ namespace adachi::io {
     }
 
     void Channel::SetReadCallback(const callback& cb) {
+        if (owner_ && !owner_->IsInThread()) {
+            owner_->SubmitAndWait([this, cb]() {
+                SetReadCallback(cb);
+            });
+            return;
+        }
         read_callback_ = cb;
     }
 
     void Channel::SetWriteCallback(const callback& cb) {
+        if (owner_ && !owner_->IsInThread()) {
+            owner_->SubmitAndWait([this, cb]() {
+                SetWriteCallback(cb);
+            });
+            return;
+        }
         write_callback_ = cb;
     }
 
     void Channel::SetErrorCallback(const callback& cb) {
+        if (owner_ && !owner_->IsInThread()) {
+            owner_->SubmitAndWait([this, cb]() {
+                SetErrorCallback(cb);
+            });
+            return;
+        }
         error_callback_ = cb;
     }
 
     void Channel::SetCloseCallback(const callback& cb) {
+        if (owner_ && !owner_->IsInThread()) {
+            owner_->SubmitAndWait([this, cb]() {
+                SetCloseCallback(cb);
+            });
+            return;
+        }
         close_callback_ = cb;
     }
 
@@ -51,6 +75,13 @@ namespace adachi::io {
     }
 
     Channel* Channel::SetActive(const int& status) {
+        if (owner_ && !owner_->IsInThread()) {
+            owner_->SubmitAndWait([this, status]() {
+                SetActive(status);
+            });
+            return this;
+        }
+
         events_ = status;
         if (!owner_) {
             ADACHI_LOG_WARNING << "SetActive failed: events set successfully but owner eventloop not found\n";

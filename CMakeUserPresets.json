@@ -7,6 +7,16 @@
             "environment":{
                 "VCPKG_ROOT": "/opt/vcpkg"
             }
+        },
+        {
+            "name": "tsan",
+            "inherits": "default",
+            "cacheVariables": {
+                "ENABLE_TSAN": "ON"
+            },
+            "environment":{
+                "VCPKG_ROOT": "/opt/vcpkg"
+            }
         }
     ]
 }
