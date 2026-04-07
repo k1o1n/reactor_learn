@@ -48,4 +48,8 @@ namespace adachi::tool {
         }
         return loop;
     }
+
+    void EventLoopThread::Join() {
+        if (thread_.joinable()) thread_.join();
+    }
 }

@@ -25,10 +25,14 @@ namespace adachi::network {
         SetSubThreadNum(1);
         SetNewconnectionCallback([](std::shared_ptr<adachi::network::TcpConnection>) {});
     }
+    TcpServer::~TcpServer() {
+        Close();
+    }
     void TcpServer::SetSubThreadNum(unsigned int num) {
         pool_->SetSize(num);
     }
     void TcpServer::Start() {
+        std::lock_guard<std::mutex> lock(mtx_);
         if (baseloop_) {
             pool_->Start();
             acceptor_->Listen();
@@ -36,6 +40,14 @@ namespace adachi::network {
         else {
             ADACHI_LOG_ERROR << "TcpServer Start failed: acceptor_thread_->Start() return nullptr\n";
         }   
+    }
+    void TcpServer::Close() {
+        std::lock_guard<std::mutex> lock(mtx_);
+        if (baseloop_) {
+            baseloop_->StopLoop();
+            acceptor_thread_->Join();
+            pool_->Close();
+        }
     }
 
     void TcpServer::SetNewconnectionCallback(std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> callback) {

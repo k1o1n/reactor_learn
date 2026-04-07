@@ -101,4 +101,8 @@ namespace adachi::io {
         std::memmove(&v, buffer_.data() + readptr_, sizeof(unsigned int));
         return v;
     }
+
+    const char* Buffer::CReadData() {
+        return buffer_.data() + readptr_;
+    }
 }

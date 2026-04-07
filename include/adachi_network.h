@@ -12,4 +12,6 @@
 #include "socket.h"
 #include "tcpconnection.h"
 #include "tcpserver.h"
+#include "timer/heartbeatobj.h"
+#include "timer/timer.h"
 #endif // ADACHI_NETWORK_H

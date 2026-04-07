@@ -43,6 +43,8 @@ namespace adachi::io {
         void RemoveFromLoop();
 
         const adachi::tool::EventLoop* GetOwner() const;
+
+        ~Channel();
     private:
         callback read_callback_;
         callback write_callback_;

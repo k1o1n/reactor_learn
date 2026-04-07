@@ -24,6 +24,7 @@ namespace adachi::tool {
         , int maxevents = 1024);
         EventLoop* Start();
         ~EventLoopThread();
+        void Join();
     private:
         std::function<void(EventLoopThread*)> prework_;
         std::function<void()> start_;

@@ -5,6 +5,7 @@
 #include <vector>
 #include <memory>
 #include "timer/timer.h"
+#include <mutex>
 
 namespace adachi::tool {
     class EventLoopThread;
@@ -26,6 +27,7 @@ namespace adachi::tool {
         void Start();
         bool IsRunning();
         void SetSize(unsigned int num);
+        void Close();
     private:
         int pos_ = 0;
         int maxevents_;
@@ -37,6 +39,8 @@ namespace adachi::tool {
         std::function<void(EventLoopThread*)> prework_;
 
         adachi::io::TimerOpt timeropt_;
+
+        std::mutex mtx_;
     };
 }
 #endif // EVENTLOOPTHREADPOOL_H

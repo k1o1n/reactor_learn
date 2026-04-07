@@ -25,6 +25,8 @@ namespace adachi::io {
         size_t Size();
         /// 读取目前存取的前32位
         unsigned int PeekUnsignedInt();
+        /// 返回可读指针所在位置的常量版本
+        const char* CReadData();
     private:
         void MovePtr();
         std::vector<char> buffer_;

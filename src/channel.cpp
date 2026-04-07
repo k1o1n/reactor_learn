@@ -126,9 +126,16 @@ namespace adachi::io {
 
     void Channel::RemoveFromLoop() {
         if (owner_) owner_->DeleteChannel(this);
+        owner_ = nullptr;
+        tied_ = false;
     }
 
     const adachi::tool::EventLoop* Channel::GetOwner() const {
         return static_cast<const adachi::tool::EventLoop*>(owner_);
+    }
+
+    Channel::~Channel() {
+        owner_ = nullptr;
+        tied_ = false;
     }
 }

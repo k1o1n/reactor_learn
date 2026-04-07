@@ -1,6 +1,7 @@
 #include "eventloopthreadpool.h"
 #include "eventloopthread.h"
 #include <algorithm>
+#include <eventloop.h>
 
 namespace adachi::tool {
     EventLoopThreadPool::EventLoopThreadPool(const adachi::io::TimerOpt& timeropt
@@ -29,6 +30,7 @@ namespace adachi::tool {
         return oper_threads_;
     }
     void EventLoopThreadPool::Start() {
+        std::lock_guard<std::mutex> lock(mtx_);
         maxnum_ = num_;
         threads_.resize(num_);
         oper_threads_.resize(num_);
@@ -37,6 +39,16 @@ namespace adachi::tool {
             oper_threads_[idx] = threads_[idx]->Start();
         }
         running_ = true;
+    }
+    void EventLoopThreadPool::Close() {
+        std::lock_guard<std::mutex> lock(mtx_);
+        running_ = false;
+        for (unsigned int idx = 0; idx < threads_.size(); ++idx) {
+            oper_threads_[idx]->StopLoop();
+        }
+        for (unsigned int idx = 0; idx < threads_.size(); ++idx) {
+            threads_[idx]->Join();
+        }
     }
     bool EventLoopThreadPool::IsRunning() {
         return running_;

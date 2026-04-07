@@ -6,6 +6,7 @@
 #include "inetaddress.h"
 #include <unordered_set>
 #include "timer/timer.h"
+#include <mutex>
 
 namespace adachi::tool {
     class EventLoopThread;
@@ -31,11 +32,14 @@ namespace adachi::network {
         , const adachi::io::TimerOpt& timeropt = {0, {0, 0}}
         , std::function<void(adachi::tool::EventLoopThread*)> prework = [](adachi::tool::EventLoopThread*){}
         , int maxevents = 1024);
+        ~TcpServer();
         void SetSubThreadNum(unsigned int num);
         void Start();
+        void Close();
 
         /// 成功建立一个TcpConnnection后需要执行什么内容
         /// 如：为TcpConnection设置读回调（OnMessage）处理Tcp粘包等问题
+        /// 调用这个函数前需要首先设定好关闭回调
         void SetNewconnectionCallback(std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> callback);
 
         /// 关闭前需要额外提供什么操作
@@ -54,6 +58,8 @@ namespace adachi::network {
 
         std::function<void(std::shared_ptr<adachi::network::TcpConnection>)> closecallback_ = [](std::shared_ptr<adachi::network::TcpConnection>) {};
         bool isheartbeat_;
+
+        std::mutex mtx_;
     };
 }
 #endif // TCPSERVER_H
